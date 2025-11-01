@@ -5,62 +5,72 @@
   <title>Shanty Chor Blaue Jungs Weilerswist 1996 e.V.</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { 
-      font-family: sans-serif; 
-      margin: 0; 
-      padding: 0 5vw; 
-      text-align: center; 
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      text-align: center;
       background: #fafafa;
     }
-    header { 
-      background: navy; 
+    header {
+      background: navy;
       color: white;
-      border-radius: 0 0 12px 12px;
+      padding: 1rem;
     }
-    nav { 
+    nav {
       background: #003366;
-      text-align: center; 
-      border-radius: 0 0 12px 12px;
+      padding: 0.75rem;
     }
-    nav a { 
-      color: white; 
-      margin: 0 1rem; 
-      text-decoration: none; 
+    nav a {
+      color: white;
+      margin: 0 1rem;
+      text-decoration: none;
       font-weight: bold;
     }
-    section { 
-      padding: 2rem 0; 
-      max-width: 1200px; 
+    main {
+      padding: 0 5vw;
+    }
+    section {
+      padding: 2rem 0;
+      max-width: 1200px;
       margin: auto;
     }
     h2 {
       color: #003366;
     }
-    .gallery { 
-      display: flex; 
-      flex-wrap: wrap; 
-      gap: 12px; 
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
       justify-content: center;
     }
-    .gallery img { 
-      width: calc(33% - 12px); 
-      max-width: 350px; 
-      border-radius: 10px; 
+    .photo-item {
+      width: calc(33% - 12px);
+      max-width: 350px;
+      text-align: center;
+    }
+    .photo-item img {
+      width: 100%;
+      border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
+    .caption {
+      font-size: 0.9rem;
+      color: #333;
+      margin-top: 6px;
+    }
     @media(max-width: 800px) {
-      .gallery img { width: 48%; }
+      .photo-item { width: 48%; }
     }
     @media(max-width: 500px) {
-      .gallery img { width: 100%; }
+      .photo-item { width: 100%; }
     }
     iframe {
       border-radius: 8px;
     }
-    footer { 
-      text-align:center; 
-      padding:2rem; 
-      background:#f0f0f0; 
+    footer {
+      text-align:center;
+      padding:2rem;
+      background:#f0f0f0;
       border-radius: 12px 12px 0 0;
     }
   </style>
