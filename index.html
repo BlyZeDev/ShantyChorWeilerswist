@@ -40,29 +40,33 @@
     .gallery {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 20px;
       justify-content: center;
     }
-    .photo-item {
-      width: calc(33% - 12px);
+    .media-item {
+      width: calc(33% - 20px);
       max-width: 350px;
-      text-align: center;
-    }
-    .photo-item img {
-      width: 100%;
+      background: white;
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      padding: 10px;
+    }
+    .media-item img,
+    .media-item video {
+      width: 100%;
+      border-radius: 8px;
     }
     .caption {
       font-size: 0.9rem;
       color: #333;
       margin-top: 6px;
+      word-wrap: break-word;
     }
     @media(max-width: 800px) {
-      .photo-item { width: 48%; }
+      .media-item { width: 48%; }
     }
     @media(max-width: 500px) {
-      .photo-item { width: 100%; }
+      .media-item { width: 100%; }
     }
     iframe {
       border-radius: 8px;
@@ -100,8 +104,8 @@
   </section>
 
   <section id="fotos">
-    <h2>Fotos</h2>
-    <div id="photoGallery" class="gallery">Lade Bilder…</div>
+    <h2>Fotos, Videos & Ordner</h2>
+    <div id="photoGallery" class="gallery">Lade Inhalte…</div>
   </section>
 </main>
 
@@ -117,50 +121,68 @@ async function listFiles(folderId) {
   const q = `'${folderId}' in parents and trashed = false`;
   const fields = "files(id,name,mimeType,description)";
   const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=${fields}&key=${API_KEY}`;
-  const r = await fetch(url);
-  const data = await r.json();
+  const resp = await fetch(url);
+  const data = await resp.json();
   return data.files || [];
 }
 
-async function collectImages(folderId, result = []) {
+async function collectMedia(folderId, result = []) {
   const files = await listFiles(folderId);
   for (const f of files) {
     if (f.mimeType === "application/vnd.google-apps.folder") {
-      await collectImages(f.id, result);
+      result.push({ type: "folder", name: f.name, desc: f.description || "" });
+      await collectMedia(f.id, result);
     } else if (f.mimeType.startsWith("image/")) {
       result.push({
-        id: f.id,
+        type: "image",
         name: f.name,
         desc: f.description || "",
-        url: `https://drive.google.com/uc?export=view&id=${f.id}`
+        src: `https://drive.google.com/uc?export=view&id=${f.id}`
+      });
+    } else if (f.mimeType.startsWith("video/")) {
+      result.push({
+        type: "video",
+        name: f.name,
+        desc: f.description || "",
+        src: `https://drive.google.com/uc?export=download&id=${f.id}`
       });
     }
   }
   return result;
 }
 
-async function loadImages() {
+async function renderMedia() {
   const gallery = document.getElementById("photoGallery");
   try {
-    const imgs = await collectImages(ROOT_FOLDER_ID);
+    const media = await collectMedia(ROOT_FOLDER_ID);
     gallery.innerHTML = "";
-    for (const img of imgs) {
+    for (const m of media) {
       const div = document.createElement("div");
-      div.className = "photo-item";
-      div.innerHTML = `
-        <img src="${img.url}" alt="${img.name}">
-        <div class="caption">${img.desc || img.name}</div>
-      `;
+      div.className = "media-item";
+      if (m.type === "folder") {
+        div.innerHTML = `<h3>📁 ${m.name}</h3><div class="caption">${m.desc}</div>`;
+      } else if (m.type === "image") {
+        div.innerHTML = `
+          <img src="${m.src}" alt="${m.name}">
+          <div class="caption">${m.desc || m.name}</div>`;
+      } else if (m.type === "video") {
+        div.innerHTML = `
+          <video controls>
+            <source src="${m.src}" type="video/mp4">
+            Dein Browser unterstützt kein Video.
+          </video>
+          <div class="caption">${m.desc || m.name}</div>`;
+      }
       gallery.appendChild(div);
     }
-    if (imgs.length === 0) gallery.textContent = "Keine Bilder gefunden.";
-  } catch (e) {
-    console.error(e);
-    gallery.textContent = "Fehler beim Laden der Bilder.";
+    if (media.length === 0) gallery.textContent = "Keine Dateien gefunden.";
+  } catch (err) {
+    console.error(err);
+    gallery.textContent = "Fehler beim Laden der Dateien.";
   }
 }
 
-document.addEventListener("DOMContentLoaded", loadImages);
+document.addEventListener("DOMContentLoaded", renderMedia);
 </script>
 
 </body>
