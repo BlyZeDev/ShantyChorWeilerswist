@@ -52,7 +52,6 @@
       padding: 10px;
       overflow: hidden;
       transition: transform 0.2s;
-      cursor: pointer;
     }
     .media-item:hover {
       transform: scale(1.02);
@@ -165,22 +164,20 @@ async function renderFolder(folderId) {
     if (f.mimeType === "application/vnd.google-apps.folder") {
       div.innerHTML = `
         <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png" alt="Ordner" style="width:60%;opacity:0.8;">
-        <div class="caption"><strong>📁 ${f.name}</strong><br>${f.description || ""}</div>`;
+        <div class="caption">${f.description || ""}</div>`;
       div.onclick = () => {
         folderStack.push(f.id);
         renderFolder(f.id);
       };
-    } else if (f.mimeType.startsWith("image/")) {
+    } 
+    else if (f.mimeType.startsWith("image/")) {
       div.innerHTML = `
-        <img src="https://drive.google.com/uc?export=view&id=${f.id}" alt="${f.name}">
-        <div class="caption">${f.description || f.name}</div>`;
-    } else if (f.mimeType.startsWith("video/") || f.name.endsWith(".mp4")) {
+        <img src="https://lh3.googleusercontent.com/d/${f.id}=w1000" alt="">
+        <div class="caption">${f.description || ""}</div>`;
+    } 
+    else if (f.mimeType.startsWith("video/") || f.name.endsWith(".mp4")) {
       div.innerHTML = `
-        <iframe src="https://drive.google.com/file/d/${f.id}/preview" frameborder="0" allowfullscreen></iframe>
-        <div class="caption">${f.description || f.name}</div>`;
-    } else {
-      div.innerHTML = `
-        <a href="https://drive.google.com/file/d/${f.id}/view" target="_blank">${f.name}</a>
+        <iframe src="https://drive.google.com/file/d/${f.id}/preview" allowfullscreen></iframe>
         <div class="caption">${f.description || ""}</div>`;
     }
 
