@@ -88,7 +88,7 @@
 <nav>
   <a href="#geschichte">Geschichte</a>
   <a href="#termine">Termine</a>
-  <a href="#fotos">Fotos</a>
+  <a href="#auftritte">Auftritte</a>
 </nav>
 
 <main>
@@ -103,8 +103,8 @@
             style="border:solid 1px #777" width="800" height="600" frameborder="0" scrolling="no"></iframe>
   </section>
 
-  <section id="fotos">
-    <h2>Fotos, Videos & Ordner</h2>
+  <section id="auftritte">
+    <h2>Auftritte</h2>
     <div id="photoGallery" class="gallery">Lade Inhalte…</div>
   </section>
 </main>
@@ -117,6 +117,7 @@
 const API_KEY = "AIzaSyDEcx7ykFSsLv2t-qegaNu4Uy540LpgDbQ";
 const ROOT_FOLDER_ID = "1v4HNqreRXUlOIWu9Xy9q35hjQ299Cuv3";
 
+// === DRIVE HELFER ===
 async function listFiles(folderId) {
   const q = `'${folderId}' in parents and trashed = false`;
   const fields = "files(id,name,mimeType,description)";
@@ -126,29 +127,38 @@ async function listFiles(folderId) {
   return data.files || [];
 }
 
-async function collectMedia(folderId, result = []) {
+async function collectMedia(folderId) {
   const files = await listFiles(folderId);
+  const media = [];
+
   for (const f of files) {
     if (f.mimeType === "application/vnd.google-apps.folder") {
-      result.push({ type: "folder", name: f.name, desc: f.description || "" });
-      await collectMedia(f.id, result);
+      media.push({
+        type: "folder",
+        name: f.name,
+        desc: f.description || "",
+        id: f.id,
+        link: `https://drive.google.com/drive/folders/${f.id}`
+      });
     } else if (f.mimeType.startsWith("image/")) {
-      result.push({
+      media.push({
         type: "image",
         name: f.name,
         desc: f.description || "",
-        src: `https://drive.google.com/uc?export=view&id=${f.id}`
+        src: `https://drive.google.com/uc?export=view&id=${f.id}`,
+        link: `https://drive.google.com/file/d/${f.id}/view`
       });
     } else if (f.mimeType.startsWith("video/")) {
-      result.push({
+      media.push({
         type: "video",
         name: f.name,
         desc: f.description || "",
-        src: `https://drive.google.com/uc?export=download&id=${f.id}`
+        src: `https://drive.google.com/file/d/${f.id}/preview`,
+        link: `https://drive.google.com/file/d/${f.id}/view`
       });
     }
   }
-  return result;
+  return media;
 }
 
 async function renderMedia() {
@@ -156,26 +166,35 @@ async function renderMedia() {
   try {
     const media = await collectMedia(ROOT_FOLDER_ID);
     gallery.innerHTML = "";
+
     for (const m of media) {
       const div = document.createElement("div");
       div.className = "media-item";
+
       if (m.type === "folder") {
-        div.innerHTML = `<h3>📁 ${m.name}</h3><div class="caption">${m.desc}</div>`;
+        div.innerHTML = `
+          <a href="${m.link}" target="_blank" style="text-decoration:none;color:inherit;">
+            <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png" alt="Ordner" style="width:60%;opacity:0.8;">
+            <div class="caption"><strong>📁 ${m.name}</strong><br>${m.desc || ""}</div>
+          </a>`;
       } else if (m.type === "image") {
         div.innerHTML = `
-          <img src="${m.src}" alt="${m.name}">
+          <a href="${m.link}" target="_blank">
+            <img src="${m.src}" alt="${m.name}">
+          </a>
           <div class="caption">${m.desc || m.name}</div>`;
       } else if (m.type === "video") {
         div.innerHTML = `
-          <video controls>
-            <source src="${m.src}" type="video/mp4">
-            Dein Browser unterstützt kein Video.
-          </video>
+          <iframe src="${m.src}" allow="autoplay" frameborder="0" allowfullscreen></iframe>
           <div class="caption">${m.desc || m.name}</div>`;
       }
+
       gallery.appendChild(div);
     }
-    if (media.length === 0) gallery.textContent = "Keine Dateien gefunden.";
+
+    if (media.length === 0)
+      gallery.textContent = "Keine Dateien gefunden oder Zugriff verweigert.";
+
   } catch (err) {
     console.error(err);
     gallery.textContent = "Fehler beim Laden der Dateien.";
