@@ -5,17 +5,66 @@
   <title>Shanty Chor Blaue Jungs Weilerswist 1996 e.V.</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: sans-serif; margin:0; padding:0; }
-    header { background: navy; color: white; padding: 1rem; text-align: center; }
-    nav { background: #003366; padding: 0.5rem; text-align: center; }
-    nav a { color: white; margin: 0 1rem; text-decoration: none; }
-    section { padding: 2rem; }
-    .gallery { display: flex; flex-wrap: wrap; gap: 10px; }
-    .gallery img { width: calc(33% - 10px); height: auto; }
-    @media(max-width: 600px) {
+    body { 
+      font-family: sans-serif; 
+      margin: 0; 
+      padding: 0 5vw; 
+      text-align: center; 
+      background: #fafafa;
+    }
+    header { 
+      background: navy; 
+      color: white; 
+      padding: 1rem; 
+      border-radius: 0 0 12px 12px;
+    }
+    nav { 
+      background: #003366; 
+      padding: 0.75rem; 
+      text-align: center; 
+      border-radius: 0 0 12px 12px;
+    }
+    nav a { 
+      color: white; 
+      margin: 0 1rem; 
+      text-decoration: none; 
+      font-weight: bold;
+    }
+    section { 
+      padding: 2rem 0; 
+      max-width: 1200px; 
+      margin: auto;
+    }
+    h2 {
+      color: #003366;
+    }
+    .gallery { 
+      display: flex; 
+      flex-wrap: wrap; 
+      gap: 12px; 
+      justify-content: center;
+    }
+    .gallery img { 
+      width: calc(33% - 12px); 
+      max-width: 350px; 
+      border-radius: 10px; 
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    @media(max-width: 800px) {
+      .gallery img { width: 48%; }
+    }
+    @media(max-width: 500px) {
       .gallery img { width: 100%; }
     }
-    .youtube-embed { width: 100%; max-width: 560px; margin: auto; }
+    iframe {
+      border-radius: 8px;
+    }
+    footer { 
+      text-align:center; 
+      padding:2rem; 
+      background:#f0f0f0; 
+      border-radius: 12px 12px 0 0;
+    }
   </style>
 </head>
 <body>
@@ -28,7 +77,6 @@
   <a href="#geschichte">Geschichte</a>
   <a href="#termine">Termine</a>
   <a href="#fotos">Fotos</a>
-  <a href="#aufnahmen">Aufnahmen</a>
 </nav>
 
 <section id="geschichte">
@@ -46,20 +94,59 @@
 
 <section id="fotos">
   <h2>Fotos</h2>
-  <div class="gallery" id="photoGallery">
-  </div>
+  <div id="photoGallery" class="gallery"></div>
 </section>
 
-<section id="aufnahmen">
-  <h2>Aufnahmen</h2>
-  <div id="videoList">
-    <div class="youtube-embed">
-      <iframe width="560" height="315" src="https://www.youtube.com/embed/VIDEO_ID_1"
-              frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-    </div>
-  </div>
-</section>
-
-<footer style="text-align:center; padding:2rem; background:#f0f0f0;">
+<footer>
   <p>© Shanty Chor Blaue Jungs Weilerswist 1996 e.V.</p>
 </footer>
+
+<script>
+const ROOT_FOLDER_ID = "1v4HNqreRXUlOIWu9Xy9q35hjQ299Cuv3";
+
+async function listFiles(folderId) {
+  const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+trashed=false&fields=files(id,name,mimeType,thumbnailLink,webViewLink,parents)&key=AIzaSyD--dummy_key`;
+  const resp = await fetch(url);
+  const data = await resp.json();
+  return data.files || [];
+}
+
+async function getAllImages(folderId, images = []) {
+  const files = await listFiles(folderId);
+  for (const f of files) {
+    if (f.mimeType === "application/vnd.google-apps.folder") {
+      await getAllImages(f.id, images);
+    } else if (f.mimeType.startsWith("image/")) {
+      const imgUrl = `https://drive.google.com/uc?export=view&id=${f.id}`;
+      images.push({ name: f.name, url: imgUrl });
+    }
+  }
+  return images;
+}
+
+async function loadDriveImages() {
+  const gallery = document.getElementById("photoGallery");
+  gallery.innerHTML = "<p>Lade Bilder…</p>";
+  try {
+    const images = await getAllImages(ROOT_FOLDER_ID);
+    gallery.innerHTML = "";
+    images.forEach(img => {
+      const el = document.createElement("img");
+      el.src = img.url;
+      el.alt = img.name;
+      gallery.appendChild(el);
+    });
+    if (images.length === 0) {
+      gallery.innerHTML = "<p>Keine Bilder gefunden.</p>";
+    }
+  } catch (err) {
+    console.error(err);
+    gallery.innerHTML = "<p>Fehler beim Laden der Bilder.</p>";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", loadDriveImages);
+</script>
+
+</body>
+</html>
