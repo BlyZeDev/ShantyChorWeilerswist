@@ -50,9 +50,14 @@
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.15);
       padding: 10px;
+      overflow: hidden;
+      transition: transform 0.2s;
+      cursor: pointer;
     }
-    .media-item img,
-    .media-item video {
+    .media-item:hover {
+      transform: scale(1.02);
+    }
+    .media-item img, .media-item iframe, .media-item video {
       width: 100%;
       border-radius: 8px;
     }
@@ -68,8 +73,15 @@
     @media(max-width: 500px) {
       .media-item { width: 100%; }
     }
-    iframe {
+    .back-btn {
+      display: inline-block;
+      background: #003366;
+      color: white;
+      padding: 0.5rem 1rem;
       border-radius: 8px;
+      text-decoration: none;
+      margin-bottom: 1rem;
+      cursor: pointer;
     }
     footer {
       text-align:center;
@@ -88,7 +100,7 @@
 <nav>
   <a href="#geschichte">Geschichte</a>
   <a href="#termine">Termine</a>
-  <a href="#auftritte">Auftritte</a>
+  <a href="#fotos">Fotos</a>
 </nav>
 
 <main>
@@ -103,8 +115,8 @@
             style="border:solid 1px #777" width="800" height="600" frameborder="0" scrolling="no"></iframe>
   </section>
 
-  <section id="auftritte">
-    <h2>Auftritte</h2>
+  <section id="fotos">
+    <h2>Fotos, Videos & Ordner</h2>
     <div id="photoGallery" class="gallery">Lade Inhalte…</div>
   </section>
 </main>
@@ -117,7 +129,8 @@
 const API_KEY = "AIzaSyDEcx7ykFSsLv2t-qegaNu4Uy540LpgDbQ";
 const ROOT_FOLDER_ID = "1v4HNqreRXUlOIWu9Xy9q35hjQ299Cuv3";
 
-// === DRIVE HELFER ===
+let folderStack = [ROOT_FOLDER_ID];
+
 async function listFiles(folderId) {
   const q = `'${folderId}' in parents and trashed = false`;
   const fields = "files(id,name,mimeType,description)";
@@ -127,81 +140,58 @@ async function listFiles(folderId) {
   return data.files || [];
 }
 
-async function collectMedia(folderId) {
+async function renderFolder(folderId) {
+  const gallery = document.getElementById("photoGallery");
+  gallery.innerHTML = "Lade Inhalte…";
+
   const files = await listFiles(folderId);
-  const media = [];
+  gallery.innerHTML = "";
+
+  if (folderStack.length > 1) {
+    const backBtn = document.createElement("div");
+    backBtn.textContent = "← Zurück";
+    backBtn.className = "back-btn";
+    backBtn.onclick = () => {
+      folderStack.pop();
+      renderFolder(folderStack[folderStack.length - 1]);
+    };
+    gallery.appendChild(backBtn);
+  }
 
   for (const f of files) {
+    const div = document.createElement("div");
+    div.className = "media-item";
+
     if (f.mimeType === "application/vnd.google-apps.folder") {
-      media.push({
-        type: "folder",
-        name: f.name,
-        desc: f.description || "",
-        id: f.id,
-        link: `https://drive.google.com/drive/folders/${f.id}`
-      });
+      div.innerHTML = `
+        <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png" alt="Ordner" style="width:60%;opacity:0.8;">
+        <div class="caption"><strong>📁 ${f.name}</strong><br>${f.description || ""}</div>`;
+      div.onclick = () => {
+        folderStack.push(f.id);
+        renderFolder(f.id);
+      };
     } else if (f.mimeType.startsWith("image/")) {
-      media.push({
-        type: "image",
-        name: f.name,
-        desc: f.description || "",
-        src: `https://drive.google.com/uc?export=view&id=${f.id}`,
-        link: `https://drive.google.com/file/d/${f.id}/view`
-      });
-    } else if (f.mimeType.startsWith("video/")) {
-      media.push({
-        type: "video",
-        name: f.name,
-        desc: f.description || "",
-        src: `https://drive.google.com/file/d/${f.id}/preview`,
-        link: `https://drive.google.com/file/d/${f.id}/view`
-      });
-    }
-  }
-  return media;
-}
-
-async function renderMedia() {
-  const gallery = document.getElementById("photoGallery");
-  try {
-    const media = await collectMedia(ROOT_FOLDER_ID);
-    gallery.innerHTML = "";
-
-    for (const m of media) {
-      const div = document.createElement("div");
-      div.className = "media-item";
-
-      if (m.type === "folder") {
-        div.innerHTML = `
-          <a href="${m.link}" target="_blank" style="text-decoration:none;color:inherit;">
-            <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png" alt="Ordner" style="width:60%;opacity:0.8;">
-            <div class="caption"><strong>📁 ${m.name}</strong><br>${m.desc || ""}</div>
-          </a>`;
-      } else if (m.type === "image") {
-        div.innerHTML = `
-          <a href="${m.link}" target="_blank">
-            <img src="${m.src}" alt="${m.name}">
-          </a>
-          <div class="caption">${m.desc || m.name}</div>`;
-      } else if (m.type === "video") {
-        div.innerHTML = `
-          <iframe src="${m.src}" allow="autoplay" frameborder="0" allowfullscreen></iframe>
-          <div class="caption">${m.desc || m.name}</div>`;
-      }
-
-      gallery.appendChild(div);
+      div.innerHTML = `
+        <img src="https://drive.google.com/uc?export=view&id=${f.id}" alt="${f.name}">
+        <div class="caption">${f.description || f.name}</div>`;
+    } else if (f.mimeType.startsWith("video/") || f.name.endsWith(".mp4")) {
+      div.innerHTML = `
+        <iframe src="https://drive.google.com/file/d/${f.id}/preview" frameborder="0" allowfullscreen></iframe>
+        <div class="caption">${f.description || f.name}</div>`;
+    } else {
+      div.innerHTML = `
+        <a href="https://drive.google.com/file/d/${f.id}/view" target="_blank">${f.name}</a>
+        <div class="caption">${f.description || ""}</div>`;
     }
 
-    if (media.length === 0)
-      gallery.textContent = "Keine Dateien gefunden oder Zugriff verweigert.";
-
-  } catch (err) {
-    console.error(err);
-    gallery.textContent = "Fehler beim Laden der Dateien.";
+    gallery.appendChild(div);
   }
+
+  if (files.length === 0)
+    gallery.innerHTML += "<p>Keine Dateien gefunden.</p>";
 }
 
-document.addEventListener("DOMContentLoaded", renderMedia);
+document.addEventListener("DOMContentLoaded", () => renderFolder(ROOT_FOLDER_ID));
 </script>
 
 </body>
