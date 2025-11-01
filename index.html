@@ -94,59 +94,14 @@
 
 <section id="fotos">
   <h2>Fotos</h2>
-  <div id="photoGallery" class="gallery"></div>
+  <iframe 
+    src="https://drive.google.com/embeddedfolderview?id=1v4HNqreRXUlOIWu9Xy9q35hjQ299Cuv3#grid"
+    style="width:100%; height:800px; border:0; border-radius:12px;">
+  </iframe>
 </section>
 
 <footer>
   <p>© Shanty Chor Blaue Jungs Weilerswist 1996 e.V.</p>
 </footer>
-
-<script>
-const ROOT_FOLDER_ID = "1v4HNqreRXUlOIWu9Xy9q35hjQ299Cuv3";
-
-async function listFiles(folderId) {
-  const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+trashed=false&fields=files(id,name,mimeType,thumbnailLink,webViewLink,parents)&key=AIzaSyD--dummy_key`;
-  const resp = await fetch(url);
-  const data = await resp.json();
-  return data.files || [];
-}
-
-async function getAllImages(folderId, images = []) {
-  const files = await listFiles(folderId);
-  for (const f of files) {
-    if (f.mimeType === "application/vnd.google-apps.folder") {
-      await getAllImages(f.id, images);
-    } else if (f.mimeType.startsWith("image/")) {
-      const imgUrl = `https://drive.google.com/uc?export=view&id=${f.id}`;
-      images.push({ name: f.name, url: imgUrl });
-    }
-  }
-  return images;
-}
-
-async function loadDriveImages() {
-  const gallery = document.getElementById("photoGallery");
-  gallery.innerHTML = "<p>Lade Bilder…</p>";
-  try {
-    const images = await getAllImages(ROOT_FOLDER_ID);
-    gallery.innerHTML = "";
-    images.forEach(img => {
-      const el = document.createElement("img");
-      el.src = img.url;
-      el.alt = img.name;
-      gallery.appendChild(el);
-    });
-    if (images.length === 0) {
-      gallery.innerHTML = "<p>Keine Bilder gefunden.</p>";
-    }
-  } catch (err) {
-    console.error(err);
-    gallery.innerHTML = "<p>Fehler beim Laden der Bilder.</p>";
-  }
-}
-
-document.addEventListener("DOMContentLoaded", loadDriveImages);
-</script>
-
 </body>
 </html>
