@@ -1,9 +1,65 @@
-<!doctype html>
-<html>
-  <head>
-    <title>Shanty Chor Blaue Jungs Weilerswist 1996 e.V.</title>
-  </head>
-  <body>
-    <p>Shanty Chor Blaue Jungs Weilerswist 1996 e.V.</p>
-  </body>
-</html>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Shanty Chor Blaue Jungs Weilerswist 1996 e.V.</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: sans-serif; margin:0; padding:0; }
+    header { background: navy; color: white; padding: 1rem; text-align: center; }
+    nav { background: #003366; padding: 0.5rem; text-align: center; }
+    nav a { color: white; margin: 0 1rem; text-decoration: none; }
+    section { padding: 2rem; }
+    .gallery { display: flex; flex-wrap: wrap; gap: 10px; }
+    .gallery img { width: calc(33% - 10px); height: auto; }
+    @media(max-width: 600px) {
+      .gallery img { width: 100%; }
+    }
+    .youtube-embed { width: 100%; max-width: 560px; margin: auto; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Shanty Chor Blaue Jungs Weilerswist 1996 e.V.</h1>
+</header>
+
+<nav>
+  <a href="#geschichte">Geschichte</a>
+  <a href="#termine">Termine</a>
+  <a href="#fotos">Fotos</a>
+  <a href="#aufnahmen">Aufnahmen</a>
+</nav>
+
+<section id="geschichte">
+  <h2>Unsere Geschichte</h2>
+  <p>Geschichte des Chores</p>
+</section>
+
+<section id="termine">
+  <h2>Termine</h2>
+  <div id="calendarEmbed">
+    <iframe src="https://calendar.google.com/calendar/embed?src=IHRE_CALENDAR_ID&ctz=Europe%2FBerlin"
+            style="border:0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
+  </div>
+</section>
+
+<section id="fotos">
+  <h2>Fotos</h2>
+  <div class="gallery" id="photoGallery">
+  </div>
+</section>
+
+<section id="aufnahmen">
+  <h2>Aufnahmen</h2>
+  <div id="videoList">
+    <div class="youtube-embed">
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/VIDEO_ID_1"
+              frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
+</section>
+
+<footer style="text-align:center; padding:2rem; background:#f0f0f0;">
+  <p>© Shanty Chor Blaue Jungs Weilerswist 1996 e.V.</p>
+</footer>
