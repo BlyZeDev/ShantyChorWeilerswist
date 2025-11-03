@@ -42,6 +42,24 @@
       color: #003366;
     }
 
+    /* HERO IMAGE */
+    #heroContainer {
+      margin-bottom: 2rem;
+    }
+    .hero-image {
+      width: 100%;
+      max-width: 1000px;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    }
+    .caption {
+      font-size: 0.9rem;
+      color: #333;
+      margin-top: 6px;
+      word-wrap: break-word;
+    }
+
+    /* GALLERY */
     .gallery {
       display: flex;
       flex-wrap: wrap;
@@ -69,13 +87,6 @@
       border-radius: 8px;
     }
 
-    .caption {
-      font-size: 0.9rem;
-      color: #333;
-      margin-top: 6px;
-      word-wrap: break-word;
-    }
-
     @media(max-width: 800px) {
       .media-item { width: 48%; }
     }
@@ -101,6 +112,7 @@
       border-radius: 12px 12px 0 0;
     }
 
+    /* LIGHTBOX */
     #lightbox {
       display: none;
       position: fixed;
@@ -174,7 +186,7 @@
       cursor: pointer;
       box-shadow: 0 3px 8px rgba(0,0,0,0.3);
       display: none;
-      z-index: 10001;
+      z-index: 10001; /* ganz oben */
       transition: opacity 0.3s;
     }
     #scrollTopBtn:hover {
@@ -197,6 +209,7 @@
 <main>
   <section id="geschichte">
     <h2>Unsere Geschichte</h2>
+    <div id="heroContainer"></div>
     <p>Geschichte des Chores</p>
   </section>
 
@@ -229,6 +242,7 @@
 <script>
 const API_KEY = "AIzaSyDEcx7ykFSsLv2t-qegaNu4Uy540LpgDbQ";
 const ROOT_FOLDER_ID = "1v4HNqreRXUlOIWu9Xy9q35hjQ299Cuv3";
+const HERO_ID = "1dOky7LzC6RWT_st_5G1zjsIzZl__cVG8";
 
 let folderStack = [ROOT_FOLDER_ID];
 let currentFiles = [];
@@ -237,6 +251,21 @@ let currentIndex = 0;
 
 function removeExtension(name) {
   return name.replace(/\.[^/.]+$/, "");
+}
+
+async function getFileName(id) {
+  const url = `https://www.googleapis.com/drive/v3/files/${id}?fields=name&key=${API_KEY}`;
+  const resp = await fetch(url);
+  const data = await resp.json();
+  return removeExtension(data.name);
+}
+
+async function renderHero() {
+  const heroContainer = document.getElementById("heroContainer");
+  const name = await getFileName(HERO_ID);
+  heroContainer.innerHTML = `
+    <img class="hero-image" src="https://lh3.googleusercontent.com/d/${HERO_ID}=w2000" alt="${name}">
+    <div class="caption">${name}</div>`;
 }
 
 async function listFiles(folderId) {
@@ -303,6 +332,7 @@ function openLightbox(id) {
   const leftArrow = document.querySelector(".nav-left");
   const rightArrow = document.querySelector(".nav-right");
 
+  // Pfeile nur zeigen, wenn mehrere Bilder vorhanden sind
   if (viewableFiles.length <= 1) {
     leftArrow.style.display = "none";
     rightArrow.style.display = "none";
@@ -358,7 +388,10 @@ scrollBtn.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
-document.addEventListener("DOMContentLoaded", () => renderFolder(ROOT_FOLDER_ID));
+document.addEventListener("DOMContentLoaded", () => {
+  renderHero();
+  renderFolder(ROOT_FOLDER_ID);
+});
 document.getElementById("lightbox").addEventListener("click", closeLightbox);
 </script>
 
