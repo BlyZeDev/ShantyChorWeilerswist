@@ -149,10 +149,10 @@
       top: 50%;
       transform: translateY(-50%);
       color: white;
-      font-size: 4rem;
+      font-size: 2.5rem;
       cursor: pointer;
       user-select: none;
-      padding: 1rem 1.5rem;
+      padding: 0.4rem 0.8rem;
       background: rgba(0,0,0,0.3);
       border-radius: 50%;
       transition: background 0.2s, transform 0.1s;
@@ -161,8 +161,8 @@
       background: rgba(0,0,0,0.7);
       transform: translateY(-50%) scale(1.1);
     }
-    .nav-left { left: 30px; }
-    .nav-right { right: 30px; }
+    .nav-left { left: 25px; }
+    .nav-right { right: 25px; }
 
     .calendar-container {
       position: relative;
@@ -215,12 +215,7 @@
 <main>
   <section id="geschichte">
     <h2>Unsere Geschichte</h2>
-    <div>
-      <a href="https://drive.google.com/file/d/1dOky7LzC6RWT_st_5G1zjsIzZl__cVG8/view?usp=sharing" target="_blank">
-        <img class="hero-image" src="https://lh3.googleusercontent.com/d/1dOky7LzC6RWT_st_5G1zjsIzZl__cVG8=w2000" alt="Gruppenbild">
-      </a>
-      <div class="caption">Gruppenbild</div>
-    </div>
+    <div id="heroContainer"></div>
     <p>Geschichte des Chores</p>
   </section>
 
@@ -242,8 +237,8 @@
 </footer>
 
 <div id="lightbox">
-  <span class="nav-arrow nav-left" onclick="prevItem(event)">❮</span>
-  <span class="nav-arrow nav-right" onclick="nextItem(event)">❯</span>
+  <span id="navLeft" class="nav-arrow nav-left" onclick="prevItem(event)">❮</span>
+  <span id="navRight" class="nav-arrow nav-right" onclick="nextItem(event)">❯</span>
   <img id="lightbox-img" style="display:none;">
   <iframe id="lightbox-vid" style="display:none;" allowfullscreen></iframe>
 </div>
@@ -253,6 +248,7 @@
 <script>
 const API_KEY = "AIzaSyDEcx7ykFSsLv2t-qegaNu4Uy540LpgDbQ";
 const ROOT_FOLDER_ID = "1v4HNqreRXUlOIWu9Xy9q35hjQ299Cuv3";
+const HERO_ID = "1dOky7LzC6RWT_st_5G1zjsIzZl__cVG8";
 
 let folderStack = [ROOT_FOLDER_ID];
 let currentFiles = [];
@@ -261,6 +257,23 @@ let currentIndex = 0;
 
 function removeExtension(name) {
   return name.replace(/\.[^/.]+$/, "");
+}
+
+async function getFileName(id) {
+  const url = `https://www.googleapis.com/drive/v3/files/${id}?fields=name&key=${API_KEY}`;
+  const resp = await fetch(url);
+  const data = await resp.json();
+  return removeExtension(data.name);
+}
+
+async function renderHero() {
+  const heroContainer = document.getElementById("heroContainer");
+  const name = await getFileName(HERO_ID);
+  heroContainer.innerHTML = `
+    <a href="https://drive.google.com/file/d/${HERO_ID}/view?usp=sharing" target="_blank">
+      <img class="hero-image" src="https://lh3.googleusercontent.com/d/${HERO_ID}=w2000" alt="${name}">
+    </a>
+    <div class="caption">${name}</div>`;
 }
 
 async function listFiles(folderId) {
@@ -291,8 +304,7 @@ async function renderFolder(folderId) {
     gallery.appendChild(backBtn);
   }
 
-  for (let i = 0; i < files.length; i++) {
-    const f = files[i];
+  for (let f of files) {
     const nameNoExt = removeExtension(f.name);
     const div = document.createElement("div");
     div.className = "media-item";
@@ -333,6 +345,13 @@ async function renderFolder(folderId) {
   if (files.length === 0) gallery.innerHTML += "<p>Keine Dateien gefunden.</p>";
 }
 
+function updateArrows() {
+  const left = document.getElementById("navLeft");
+  const right = document.getElementById("navRight");
+  left.style.display = currentIndex > 0 ? "block" : "none";
+  right.style.display = currentIndex < viewableFiles.length - 1 ? "block" : "none";
+}
+
 function openLightbox(id) {
   const f = viewableFiles.find(x => x.id === id);
   currentIndex = viewableFiles.indexOf(f);
@@ -347,10 +366,9 @@ function openLightbox(id) {
   } else {
     vid.src = `https://drive.google.com/file/d/${f.id}/preview`;
     vid.style.display = "block";
-    vid.style.width = "90vw";
-    vid.style.height = "90vh";
     img.style.display = "none";
   }
+  updateArrows();
   lightbox.style.display = "flex";
 }
 
@@ -361,14 +379,18 @@ function closeLightbox() {
 
 function nextItem(e) {
   e.stopPropagation();
-  currentIndex = (currentIndex + 1) % viewableFiles.length;
-  openLightbox(viewableFiles[currentIndex].id);
+  if (currentIndex < viewableFiles.length - 1) {
+    currentIndex++;
+    openLightbox(viewableFiles[currentIndex].id);
+  }
 }
 
 function prevItem(e) {
   e.stopPropagation();
-  currentIndex = (currentIndex - 1 + viewableFiles.length) % viewableFiles.length;
-  openLightbox(viewableFiles[currentIndex].id);
+  if (currentIndex > 0) {
+    currentIndex--;
+    openLightbox(viewableFiles[currentIndex].id);
+  }
 }
 
 document.addEventListener("keydown", (e) => {
@@ -387,7 +409,10 @@ scrollBtn.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
-document.addEventListener("DOMContentLoaded", () => renderFolder(ROOT_FOLDER_ID));
+document.addEventListener("DOMContentLoaded", () => {
+  renderHero();
+  renderFolder(ROOT_FOLDER_ID);
+});
 document.getElementById("lightbox").addEventListener("click", closeLightbox);
 </script>
 
