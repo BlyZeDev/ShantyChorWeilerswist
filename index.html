@@ -123,6 +123,7 @@
       border-radius: 12px 12px 0 0;
     }
 
+    /* --- Lightbox Fix --- */
     #lightbox {
       display: none;
       position: fixed;
@@ -133,7 +134,6 @@
       background: rgba(0,0,0,0.95);
       justify-content: center;
       align-items: center;
-      transition: opacity 0.3s ease;
     }
     #lightbox img, #lightbox iframe {
       max-width: 95vw;
@@ -142,6 +142,10 @@
       height: auto;
       border-radius: 10px;
       box-shadow: 0 0 30px rgba(0,0,0,0.7);
+    }
+    #lightbox iframe {
+      width: 90vw;
+      height: 80vh;
     }
 
     .nav-arrow {
@@ -237,8 +241,8 @@
 </footer>
 
 <div id="lightbox">
-  <span id="navLeft" class="nav-arrow nav-left" onclick="prevItem(event)">❮</span>
-  <span id="navRight" class="nav-arrow nav-right" onclick="nextItem(event)">❯</span>
+  <span class="nav-arrow nav-left" onclick="prevItem(event)">❮</span>
+  <span class="nav-arrow nav-right" onclick="nextItem(event)">❯</span>
   <img id="lightbox-img" style="display:none;">
   <iframe id="lightbox-vid" style="display:none;" allowfullscreen></iframe>
 </div>
@@ -345,13 +349,6 @@ async function renderFolder(folderId) {
   if (files.length === 0) gallery.innerHTML += "<p>Keine Dateien gefunden.</p>";
 }
 
-function updateArrows() {
-  const left = document.getElementById("navLeft");
-  const right = document.getElementById("navRight");
-  left.style.display = currentIndex > 0 ? "block" : "none";
-  right.style.display = currentIndex < viewableFiles.length - 1 ? "block" : "none";
-}
-
 function openLightbox(id) {
   const f = viewableFiles.find(x => x.id === id);
   currentIndex = viewableFiles.indexOf(f);
@@ -368,29 +365,25 @@ function openLightbox(id) {
     vid.style.display = "block";
     img.style.display = "none";
   }
-  updateArrows();
   lightbox.style.display = "flex";
 }
 
 function closeLightbox() {
-  document.getElementById("lightbox").style.display = "none";
+  const lb = document.getElementById("lightbox");
+  lb.style.display = "none";
   document.getElementById("lightbox-vid").src = "";
 }
 
 function nextItem(e) {
   e.stopPropagation();
-  if (currentIndex < viewableFiles.length - 1) {
-    currentIndex++;
-    openLightbox(viewableFiles[currentIndex].id);
-  }
+  currentIndex = (currentIndex + 1) % viewableFiles.length;
+  openLightbox(viewableFiles[currentIndex].id);
 }
 
 function prevItem(e) {
   e.stopPropagation();
-  if (currentIndex > 0) {
-    currentIndex--;
-    openLightbox(viewableFiles[currentIndex].id);
-  }
+  currentIndex = (currentIndex - 1 + viewableFiles.length) % viewableFiles.length;
+  openLightbox(viewableFiles[currentIndex].id);
 }
 
 document.addEventListener("keydown", (e) => {
