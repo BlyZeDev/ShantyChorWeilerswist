@@ -70,6 +70,7 @@
       border-radius: 6px;
       padding: 4px;
       text-decoration: none;
+      z-index: 2;
     }
     .drive-link img {
       width: 20px;
@@ -116,27 +117,36 @@
       align-items: center;
     }
     #lightbox img, #lightbox iframe {
-      max-width: 90%;
-      max-height: 90%;
+      max-width: 90vw;
+      max-height: 90vh;
+      width: auto;
+      height: auto;
       border-radius: 10px;
     }
+
     .nav-arrow {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
       color: white;
-      font-size: 2rem;
+      font-size: 3rem;
       cursor: pointer;
       user-select: none;
-      padding: 0.5rem;
-      background: rgba(0,0,0,0.3);
+      padding: 0.6rem 1rem;
+      background: rgba(0,0,0,0.4);
       border-radius: 50%;
+      line-height: 1;
     }
     .nav-arrow:hover {
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.7);
     }
     .nav-left { left: 20px; }
     .nav-right { right: 20px; }
+
+    #geschichte .media-item {
+      width: 80%;
+      max-width: 900px;
+    }
 
     .calendar-container {
       position: relative;
@@ -175,7 +185,7 @@
         <a href="https://drive.google.com/file/d/1dOky7LzC6RWT_st_5G1zjsIzZl__cVG8/view?usp=sharing" target="_blank" class="drive-link">
           <img src="https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png" alt="Drive">
         </a>
-        <img src="https://lh3.googleusercontent.com/d/1dOky7LzC6RWT_st_5G1zjsIzZl__cVG8=w1000" alt="Chor-Bild">
+        <img src="https://lh3.googleusercontent.com/d/1dOky7LzC6RWT_st_5G1zjsIzZl__cVG8=w2000" alt="Chor-Bild">
         <div class="caption">Chor-Bild</div>
       </div>
     </div>
@@ -275,6 +285,9 @@ async function renderFolder(folderId) {
     } 
     else if (f.mimeType.startsWith("video/") || f.name.endsWith(".mp4")) {
       div.innerHTML = `
+        <a href="https://drive.google.com/file/d/${f.id}/view" target="_blank" class="drive-link">
+          <img src="https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png" alt="Drive">
+        </a>
         <iframe src="https://drive.google.com/file/d/${f.id}/preview" allowfullscreen></iframe>
         <div class="caption">${nameNoExt}</div>`;
       div.onclick = (e) => {
