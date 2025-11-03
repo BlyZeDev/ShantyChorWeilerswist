@@ -69,6 +69,13 @@
       border-radius: 8px;
     }
 
+    .hero-image {
+      width: 100%;
+      max-width: 1000px;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    }
+
     .drive-link {
       position: absolute;
       top: 8px;
@@ -142,10 +149,10 @@
       top: 50%;
       transform: translateY(-50%);
       color: white;
-      font-size: 3rem;
+      font-size: 4rem;
       cursor: pointer;
       user-select: none;
-      padding: 0.6rem 1rem;
+      padding: 1rem 1.5rem;
       background: rgba(0,0,0,0.3);
       border-radius: 50%;
       transition: background 0.2s, transform 0.1s;
@@ -154,8 +161,8 @@
       background: rgba(0,0,0,0.7);
       transform: translateY(-50%) scale(1.1);
     }
-    .nav-left { left: 20px; }
-    .nav-right { right: 20px; }
+    .nav-left { left: 30px; }
+    .nav-right { right: 30px; }
 
     .calendar-container {
       position: relative;
@@ -208,14 +215,11 @@
 <main>
   <section id="geschichte">
     <h2>Unsere Geschichte</h2>
-    <div class="gallery">
-      <div class="media-item">
-        <a href="https://drive.google.com/file/d/1dOky7LzC6RWT_st_5G1zjsIzZl__cVG8/view?usp=sharing" target="_blank" class="drive-link">
-          <img src="https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png" alt="Drive">
-        </a>
-        <img src="https://lh3.googleusercontent.com/d/1dOky7LzC6RWT_st_5G1zjsIzZl__cVG8=w2000" alt="Chor-Bild">
-        <div class="caption">Chor-Bild</div>
-      </div>
+    <div>
+      <a href="https://drive.google.com/file/d/1dOky7LzC6RWT_st_5G1zjsIzZl__cVG8/view?usp=sharing" target="_blank">
+        <img class="hero-image" src="https://lh3.googleusercontent.com/d/1dOky7LzC6RWT_st_5G1zjsIzZl__cVG8=w2000" alt="Gruppenbild">
+      </a>
+      <div class="caption">Gruppenbild</div>
     </div>
     <p>Geschichte des Chores</p>
   </section>
@@ -252,6 +256,7 @@ const ROOT_FOLDER_ID = "1v4HNqreRXUlOIWu9Xy9q35hjQ299Cuv3";
 
 let folderStack = [ROOT_FOLDER_ID];
 let currentFiles = [];
+let viewableFiles = [];
 let currentIndex = 0;
 
 function removeExtension(name) {
@@ -272,6 +277,7 @@ async function renderFolder(folderId) {
   gallery.innerHTML = "Lade Inhalte…";
   const files = await listFiles(folderId);
   currentFiles = files;
+  viewableFiles = files.filter(f => f.mimeType !== "application/vnd.google-apps.folder");
   gallery.innerHTML = "";
 
   if (folderStack.length > 1) {
@@ -306,7 +312,7 @@ async function renderFolder(folderId) {
         <img src="https://lh3.googleusercontent.com/d/${f.id}=w1000" alt="${nameNoExt}">
         <div class="caption">${nameNoExt}</div>`;
       div.onclick = (e) => {
-        if (!e.target.closest(".drive-link")) openLightbox(i);
+        if (!e.target.closest(".drive-link")) openLightbox(f.id);
       };
     } 
     else if (f.mimeType.startsWith("video/") || f.name.endsWith(".mp4")) {
@@ -317,7 +323,7 @@ async function renderFolder(folderId) {
         <iframe src="https://drive.google.com/file/d/${f.id}/preview" allowfullscreen></iframe>
         <div class="caption">${nameNoExt}</div>`;
       div.onclick = (e) => {
-        if (!e.target.closest(".drive-link")) openLightbox(i);
+        if (!e.target.closest(".drive-link")) openLightbox(f.id);
       };
     }
 
@@ -327,9 +333,9 @@ async function renderFolder(folderId) {
   if (files.length === 0) gallery.innerHTML += "<p>Keine Dateien gefunden.</p>";
 }
 
-function openLightbox(index) {
-  currentIndex = index;
-  const f = currentFiles[index];
+function openLightbox(id) {
+  const f = viewableFiles.find(x => x.id === id);
+  currentIndex = viewableFiles.indexOf(f);
   const lightbox = document.getElementById("lightbox");
   const img = document.getElementById("lightbox-img");
   const vid = document.getElementById("lightbox-vid");
@@ -355,14 +361,14 @@ function closeLightbox() {
 
 function nextItem(e) {
   e.stopPropagation();
-  currentIndex = (currentIndex + 1) % currentFiles.length;
-  openLightbox(currentIndex);
+  currentIndex = (currentIndex + 1) % viewableFiles.length;
+  openLightbox(viewableFiles[currentIndex].id);
 }
 
 function prevItem(e) {
   e.stopPropagation();
-  currentIndex = (currentIndex - 1 + currentFiles.length) % currentFiles.length;
-  openLightbox(currentIndex);
+  currentIndex = (currentIndex - 1 + viewableFiles.length) % viewableFiles.length;
+  openLightbox(viewableFiles[currentIndex].id);
 }
 
 document.addEventListener("keydown", (e) => {
