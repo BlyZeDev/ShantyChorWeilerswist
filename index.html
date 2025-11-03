@@ -53,13 +53,27 @@
       overflow: hidden;
       transition: transform 0.2s;
       cursor: pointer;
+      position: relative;
     }
     .media-item:hover {
       transform: scale(1.02);
     }
-    .media-item img, .media-item iframe, .media-item video {
+    .media-item img, .media-item iframe {
       width: 100%;
       border-radius: 8px;
+    }
+    .drive-link {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255,255,255,0.8);
+      border-radius: 6px;
+      padding: 4px;
+      text-decoration: none;
+    }
+    .drive-link img {
+      width: 20px;
+      height: 20px;
     }
     .caption {
       font-size: 0.9rem;
@@ -90,7 +104,6 @@
       border-radius: 12px 12px 0 0;
     }
 
-    /* Vollbild Lightbox */
     #lightbox {
       display: none;
       position: fixed;
@@ -102,16 +115,29 @@
       justify-content: center;
       align-items: center;
     }
-    #lightbox img, #lightbox iframe, #lightbox video {
+    #lightbox img, #lightbox iframe {
       max-width: 90%;
       max-height: 90%;
       border-radius: 10px;
     }
-    #lightbox.close {
+    .nav-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: white;
+      font-size: 2rem;
       cursor: pointer;
+      user-select: none;
+      padding: 0.5rem;
+      background: rgba(0,0,0,0.3);
+      border-radius: 50%;
     }
+    .nav-arrow:hover {
+      background: rgba(0,0,0,0.6);
+    }
+    .nav-left { left: 20px; }
+    .nav-right { right: 20px; }
 
-    /* Responsive Kalender */
     .calendar-container {
       position: relative;
       overflow: hidden;
@@ -143,6 +169,17 @@
 <main>
   <section id="geschichte">
     <h2>Unsere Geschichte</h2>
+
+    <div class="gallery">
+      <div class="media-item">
+        <a href="https://drive.google.com/file/d/1dOky7LzC6RWT_st_5G1zjsIzZl__cVG8/view?usp=sharing" target="_blank" class="drive-link">
+          <img src="https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png" alt="Drive">
+        </a>
+        <img src="https://lh3.googleusercontent.com/d/1dOky7LzC6RWT_st_5G1zjsIzZl__cVG8=w1000" alt="Chor-Bild">
+        <div class="caption">Chor-Bild</div>
+      </div>
+    </div>
+
     <p>Geschichte des Chores</p>
   </section>
 
@@ -163,7 +200,9 @@
   <p>© Shanty Chor Blaue Jungs Weilerswist 1996 e.V.</p>
 </footer>
 
-<div id="lightbox" onclick="closeLightbox()">
+<div id="lightbox">
+  <span class="nav-arrow nav-left" onclick="prevItem(event)">❮</span>
+  <span class="nav-arrow nav-right" onclick="nextItem(event)">❯</span>
   <img id="lightbox-img" style="display:none;">
   <iframe id="lightbox-vid" style="display:none;" allowfullscreen></iframe>
 </div>
@@ -173,6 +212,12 @@ const API_KEY = "AIzaSyDEcx7ykFSsLv2t-qegaNu4Uy540LpgDbQ";
 const ROOT_FOLDER_ID = "1v4HNqreRXUlOIWu9Xy9q35hjQ299Cuv3";
 
 let folderStack = [ROOT_FOLDER_ID];
+let currentFiles = [];
+let currentIndex = 0;
+
+function removeExtension(name) {
+  return name.replace(/\.[^/.]+$/, "");
+}
 
 async function listFiles(folderId) {
   const q = `'${folderId}' in parents and trashed = false`;
@@ -188,6 +233,7 @@ async function renderFolder(folderId) {
   gallery.innerHTML = "Lade Inhalte…";
 
   const files = await listFiles(folderId);
+  currentFiles = files;
   gallery.innerHTML = "";
 
   if (folderStack.length > 1) {
@@ -201,14 +247,16 @@ async function renderFolder(folderId) {
     gallery.appendChild(backBtn);
   }
 
-  for (const f of files) {
+  for (let i = 0; i < files.length; i++) {
+    const f = files[i];
+    const nameNoExt = removeExtension(f.name);
     const div = document.createElement("div");
     div.className = "media-item";
 
     if (f.mimeType === "application/vnd.google-apps.folder") {
       div.innerHTML = `
         <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png" alt="Ordner" style="width:60%;opacity:0.8;">
-        <div class="caption">${f.name}</div>`;
+        <div class="caption">${nameNoExt}</div>`;
       div.onclick = () => {
         folderStack.push(f.id);
         renderFolder(f.id);
@@ -216,15 +264,22 @@ async function renderFolder(folderId) {
     } 
     else if (f.mimeType.startsWith("image/")) {
       div.innerHTML = `
-        <img src="https://lh3.googleusercontent.com/d/${f.id}=w1000" alt="${f.name}">
-        <div class="caption">${f.name}</div>`;
-      div.onclick = () => openLightboxImage(`https://lh3.googleusercontent.com/d/${f.id}=w2000`);
+        <a href="https://drive.google.com/file/d/${f.id}/view" target="_blank" class="drive-link">
+          <img src="https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png" alt="Drive">
+        </a>
+        <img src="https://lh3.googleusercontent.com/d/${f.id}=w1000" alt="${nameNoExt}">
+        <div class="caption">${nameNoExt}</div>`;
+      div.onclick = (e) => {
+        if (!e.target.closest(".drive-link")) openLightbox(i);
+      };
     } 
     else if (f.mimeType.startsWith("video/") || f.name.endsWith(".mp4")) {
       div.innerHTML = `
         <iframe src="https://drive.google.com/file/d/${f.id}/preview" allowfullscreen></iframe>
-        <div class="caption">${f.name}</div>`;
-      div.onclick = () => openLightboxVideo(`https://drive.google.com/file/d/${f.id}/preview`);
+        <div class="caption">${nameNoExt}</div>`;
+      div.onclick = (e) => {
+        if (!e.target.closest(".drive-link")) openLightbox(i);
+      };
     }
 
     gallery.appendChild(div);
@@ -234,20 +289,22 @@ async function renderFolder(folderId) {
     gallery.innerHTML += "<p>Keine Dateien gefunden.</p>";
 }
 
-// Lightbox Funktionen
-function openLightboxImage(url) {
+function openLightbox(index) {
+  currentIndex = index;
+  const f = currentFiles[index];
   const lightbox = document.getElementById("lightbox");
-  document.getElementById("lightbox-img").src = url;
-  document.getElementById("lightbox-img").style.display = "block";
-  document.getElementById("lightbox-vid").style.display = "none";
-  lightbox.style.display = "flex";
-}
+  const img = document.getElementById("lightbox-img");
+  const vid = document.getElementById("lightbox-vid");
 
-function openLightboxVideo(url) {
-  const lightbox = document.getElementById("lightbox");
-  document.getElementById("lightbox-vid").src = url;
-  document.getElementById("lightbox-vid").style.display = "block";
-  document.getElementById("lightbox-img").style.display = "none";
+  if (f.mimeType.startsWith("image/")) {
+    img.src = `https://lh3.googleusercontent.com/d/${f.id}=w2000`;
+    img.style.display = "block";
+    vid.style.display = "none";
+  } else {
+    vid.src = `https://drive.google.com/file/d/${f.id}/preview`;
+    vid.style.display = "block";
+    img.style.display = "none";
+  }
   lightbox.style.display = "flex";
 }
 
@@ -256,7 +313,20 @@ function closeLightbox() {
   document.getElementById("lightbox-vid").src = "";
 }
 
+function nextItem(e) {
+  e.stopPropagation();
+  currentIndex = (currentIndex + 1) % currentFiles.length;
+  openLightbox(currentIndex);
+}
+
+function prevItem(e) {
+  e.stopPropagation();
+  currentIndex = (currentIndex - 1 + currentFiles.length) % currentFiles.length;
+  openLightbox(currentIndex);
+}
+
 document.addEventListener("DOMContentLoaded", () => renderFolder(ROOT_FOLDER_ID));
+document.getElementById("lightbox").addEventListener("click", closeLightbox);
 </script>
 
 </body>
