@@ -69,28 +69,6 @@
       border-radius: 8px;
     }
 
-    .hero-image {
-      width: 100%;
-      max-width: 1000px;
-      border-radius: 12px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.25);
-    }
-
-    .drive-link {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(255,255,255,0.8);
-      border-radius: 6px;
-      padding: 4px;
-      text-decoration: none;
-      z-index: 2;
-    }
-    .drive-link img {
-      width: 20px;
-      height: 20px;
-    }
-
     .caption {
       font-size: 0.9rem;
       color: #333;
@@ -123,11 +101,10 @@
       border-radius: 12px 12px 0 0;
     }
 
-    /* --- Lightbox Fix --- */
     #lightbox {
       display: none;
       position: fixed;
-      z-index: 9999;
+      z-index: 9998;
       top: 0; left: 0;
       width: 100%;
       height: 100%;
@@ -138,8 +115,6 @@
     #lightbox img, #lightbox iframe {
       max-width: 95vw;
       max-height: 95vh;
-      width: auto;
-      height: auto;
       border-radius: 10px;
       box-shadow: 0 0 30px rgba(0,0,0,0.7);
     }
@@ -168,19 +143,21 @@
     .nav-left { left: 25px; }
     .nav-right { right: 25px; }
 
-    .calendar-container {
-      position: relative;
-      overflow: hidden;
-      width: 100%;
-      padding-top: 75%;
-    }
-    .calendar-container iframe {
+    .close-btn {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: 0;
+      top: 20px;
+      right: 30px;
+      font-size: 2rem;
+      color: white;
+      background: rgba(0,0,0,0.3);
+      padding: 0.4rem 0.8rem;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.2s;
+      z-index: 10000;
+    }
+    .close-btn:hover {
+      background: rgba(0,0,0,0.7);
     }
 
     #scrollTopBtn {
@@ -197,6 +174,7 @@
       cursor: pointer;
       box-shadow: 0 3px 8px rgba(0,0,0,0.3);
       display: none;
+      z-index: 10001;
       transition: opacity 0.3s;
     }
     #scrollTopBtn:hover {
@@ -219,15 +197,13 @@
 <main>
   <section id="geschichte">
     <h2>Unsere Geschichte</h2>
-    <div id="heroContainer"></div>
     <p>Geschichte des Chores</p>
   </section>
 
   <section id="termine">
     <h2>Termine</h2>
-    <div class="calendar-container">
-      <iframe src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=Europe%2FBerlin&showPrint=0&src=c2hhbnR5Y2hvcndlaWxlcnN3aXN0QGdtYWlsLmNvbQ&color=%23039be5"></iframe>
-    </div>
+    <iframe src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=Europe%2FBerlin&showPrint=0&src=c2hhbnR5Y2hvcndlaWxlcnN3aXN0QGdtYWlsLmNvbQ&color=%23039be5"
+            style="border:solid 1px #777" width="800" height="600" frameborder="0" scrolling="no"></iframe>
   </section>
 
   <section id="auftritte">
@@ -241,6 +217,7 @@
 </footer>
 
 <div id="lightbox">
+  <span class="close-btn" onclick="closeLightbox(event)">✕</span>
   <span class="nav-arrow nav-left" onclick="prevItem(event)">❮</span>
   <span class="nav-arrow nav-right" onclick="nextItem(event)">❯</span>
   <img id="lightbox-img" style="display:none;">
@@ -252,7 +229,6 @@
 <script>
 const API_KEY = "AIzaSyDEcx7ykFSsLv2t-qegaNu4Uy540LpgDbQ";
 const ROOT_FOLDER_ID = "1v4HNqreRXUlOIWu9Xy9q35hjQ299Cuv3";
-const HERO_ID = "1dOky7LzC6RWT_st_5G1zjsIzZl__cVG8";
 
 let folderStack = [ROOT_FOLDER_ID];
 let currentFiles = [];
@@ -261,23 +237,6 @@ let currentIndex = 0;
 
 function removeExtension(name) {
   return name.replace(/\.[^/.]+$/, "");
-}
-
-async function getFileName(id) {
-  const url = `https://www.googleapis.com/drive/v3/files/${id}?fields=name&key=${API_KEY}`;
-  const resp = await fetch(url);
-  const data = await resp.json();
-  return removeExtension(data.name);
-}
-
-async function renderHero() {
-  const heroContainer = document.getElementById("heroContainer");
-  const name = await getFileName(HERO_ID);
-  heroContainer.innerHTML = `
-    <a href="https://drive.google.com/file/d/${HERO_ID}/view?usp=sharing" target="_blank">
-      <img class="hero-image" src="https://lh3.googleusercontent.com/d/${HERO_ID}=w2000" alt="${name}">
-    </a>
-    <div class="caption">${name}</div>`;
 }
 
 async function listFiles(folderId) {
@@ -321,26 +280,12 @@ async function renderFolder(folderId) {
       };
     } 
     else if (f.mimeType.startsWith("image/")) {
-      div.innerHTML = `
-        <a href="https://drive.google.com/file/d/${f.id}/view" target="_blank" class="drive-link">
-          <img src="https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png">
-        </a>
-        <img src="https://lh3.googleusercontent.com/d/${f.id}=w1000" alt="${nameNoExt}">
-        <div class="caption">${nameNoExt}</div>`;
-      div.onclick = (e) => {
-        if (!e.target.closest(".drive-link")) openLightbox(f.id);
-      };
+      div.innerHTML = `<img src="https://lh3.googleusercontent.com/d/${f.id}=w1000" alt="${nameNoExt}"><div class="caption">${nameNoExt}</div>`;
+      div.onclick = () => openLightbox(f.id);
     } 
     else if (f.mimeType.startsWith("video/") || f.name.endsWith(".mp4")) {
-      div.innerHTML = `
-        <a href="https://drive.google.com/file/d/${f.id}/view" target="_blank" class="drive-link">
-          <img src="https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png">
-        </a>
-        <iframe src="https://drive.google.com/file/d/${f.id}/preview" allowfullscreen></iframe>
-        <div class="caption">${nameNoExt}</div>`;
-      div.onclick = (e) => {
-        if (!e.target.closest(".drive-link")) openLightbox(f.id);
-      };
+      div.innerHTML = `<iframe src="https://drive.google.com/file/d/${f.id}/preview" allowfullscreen></iframe><div class="caption">${nameNoExt}</div>`;
+      div.onclick = () => openLightbox(f.id);
     }
 
     gallery.appendChild(div);
@@ -355,6 +300,16 @@ function openLightbox(id) {
   const lightbox = document.getElementById("lightbox");
   const img = document.getElementById("lightbox-img");
   const vid = document.getElementById("lightbox-vid");
+  const leftArrow = document.querySelector(".nav-left");
+  const rightArrow = document.querySelector(".nav-right");
+
+  if (viewableFiles.length <= 1) {
+    leftArrow.style.display = "none";
+    rightArrow.style.display = "none";
+  } else {
+    leftArrow.style.display = "block";
+    rightArrow.style.display = "block";
+  }
 
   if (f.mimeType.startsWith("image/")) {
     img.src = `https://lh3.googleusercontent.com/d/${f.id}=w2400`;
@@ -368,7 +323,8 @@ function openLightbox(id) {
   lightbox.style.display = "flex";
 }
 
-function closeLightbox() {
+function closeLightbox(e) {
+  e.stopPropagation();
   const lb = document.getElementById("lightbox");
   lb.style.display = "none";
   document.getElementById("lightbox-vid").src = "";
@@ -390,7 +346,7 @@ document.addEventListener("keydown", (e) => {
   if (document.getElementById("lightbox").style.display === "flex") {
     if (e.key === "ArrowRight") nextItem(e);
     if (e.key === "ArrowLeft") prevItem(e);
-    if (e.key === "Escape") closeLightbox();
+    if (e.key === "Escape") closeLightbox(e);
   }
 });
 
@@ -402,10 +358,7 @@ scrollBtn.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  renderHero();
-  renderFolder(ROOT_FOLDER_ID);
-});
+document.addEventListener("DOMContentLoaded", () => renderFolder(ROOT_FOLDER_ID));
 document.getElementById("lightbox").addEventListener("click", closeLightbox);
 </script>
 
