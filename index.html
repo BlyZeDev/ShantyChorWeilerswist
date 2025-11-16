@@ -168,12 +168,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(0,0,0,0.3);
+      background: rgba(0,0,0,0);
       border-radius: 50%;
       transition: background 0.2s, transform 0.1s;
     }
     .nav-arrow:hover {
-      background: rgba(0,0,0,0.7);
+      background: rgba(0,0,0,0.5);
       transform: translateY(-50%) scale(1.1);
     }
     .nav-left { left: 25px; }
@@ -185,7 +185,7 @@
       right: 30px;
       font-size: 2rem;
       color: white;
-      background: rgba(0,0,0,0.3);
+      background: rgba(0,0,0,0);
       width: 50px;
       height: 50px;
       display: flex;
@@ -197,7 +197,23 @@
       z-index: 10000;
     }
     .close-btn:hover {
-      background: rgba(0,0,0,0.7);
+      background: rgba(0,0,0,0.5);
+    }
+
+    .google-form-container {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .google-form-container iframe {
+      width: 100%;
+      height: 900px;
+      border: none;
     }
 
     #scrollTopBtn {
@@ -235,6 +251,7 @@
   <a href="#geschichte">Geschichte</a>
   <a href="#termine">Termine</a>
   <a href="#auftritte">Auftritte</a>
+  <a href="#kontakt">Kontakt</a>
 </nav>
 
 <main>
@@ -366,6 +383,7 @@
     <iframe src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=Europe%2FBerlin&showPrint=0&src=c2hhbnR5Y2hvcndlaWxlcnN3aXN0QGdtYWlsLmNvbQ&color=%23039be5"
             frameborder="0"
             scrolling="no">
+            Wird geladen...
     </iframe>
 </div>
 
@@ -374,6 +392,23 @@
   <section id="auftritte">
     <h2>Auftritte</h2>
     <div id="photoGallery" class="gallery">Lade Inhalte…</div>
+  </section>
+
+  <section id="kontakt">
+    <h2>Kontakt</h2>
+
+    <p>
+      Sie möchten uns eine Nachricht schicken?  
+      Nutzen Sie bitte das folgende Formular:
+    </p>
+
+    <div class="google-form-container">
+      <iframe src="https://docs.google.com/forms/d/e/Ra9i5C1Pp3mkoSyT7/viewform?embedded=true"
+              frameborder="0"
+              scrolling="no">
+              Wird geladen…
+      </iframe>
+    </div>
   </section>
 </main>
 
