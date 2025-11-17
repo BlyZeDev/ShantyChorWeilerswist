@@ -200,24 +200,6 @@
       background: rgba(0,0,0,0.5);
     }
 
-    .google-form-container {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      background: transparent;
-      border-radius: 0;
-      box-shadow: none;
-    }
-
-    .google-form-container iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      margin: 0;
-      padding: 0;
-    }
-
     #scrollTopBtn {
       position: fixed;
       bottom: 20px;
@@ -405,13 +387,14 @@
     </p>
 
     <div class="google-form-container">
-      <div style="width:100%; max-width:800px; margin:auto;">
-        <iframe id="dynamicForm"
-                src="https://script.google.com/macros/s/AKfycbyNifpUVoEEbMgD_JGXdqYtbJt5igTB7_ZAFfW2L-hInn-28d8-zVlzZmlGlIkpN7b-lQ/exec"
-                width="100%"
-                style="border:none; height:500px;"
-        ></iframe>
-      </div>
+      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeM-pz5pZ2yrcjuGLIXXW9zoe_5TF-tZN645P0ZEf1pw2v5MA/viewform?embedded=true"
+              width="100%"
+              height="750"
+              frameborder="0"
+              marginheight="0"
+              marginwidth="0">
+              Wird geladen…
+            </iframe>
     </div>
   </section>
 </main>
@@ -584,13 +567,6 @@ document.addEventListener("DOMContentLoaded", () => {
   renderFolder(ROOT_FOLDER_ID);
 });
 document.getElementById("lightbox").addEventListener("click", closeLightbox);
-
-window.addEventListener("message", (event) => {
-  if (event.data.formHeight) {
-    document.getElementById("dynamicForm").style.height =
-      event.data.formHeight + "px";
-  }
-});
 </script>
 
 </body>
