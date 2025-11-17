@@ -43,6 +43,26 @@
       font-weight: bold;
     }
 
+    nav a {
+      position: relative;
+      padding-bottom: 4px;
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0%;
+      height: 2px;
+      background: white;
+      transition: width 0.25s ease;
+    }
+
+    nav a:hover::after {
+      width: 100%;
+    }
+
     @media (max-width: 700px) {
       nav {
         justify-content: space-between;
@@ -50,7 +70,36 @@
       }
 
       .menu-toggle {
+        width: 35px;
+        height: 28px;
+        position: relative;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        margin-left: auto;
+      }
+
+      .menu-toggle span {
         display: block;
+        height: 4px;
+        width: 100%;
+        background: white;
+        border-radius: 3px;
+        transition: 0.35s ease;
+        transform-origin: center;
+      }
+
+      .menu-toggle.open span:nth-child(1) {
+        transform: translateY(12px) rotate(45deg);
+      }
+
+      .menu-toggle.open span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .menu-toggle.open span:nth-child(3) {
+        transform: translateY(-12px) rotate(-45deg);
       }
 
       .nav-links {
@@ -70,6 +119,13 @@
 
       .nav-links.open {
         display: flex;
+      }
+    }
+
+    @media (min-width: 701px) {
+      .nav-links a {
+        margin: 0 1.2rem;
+        font-size: 1.05rem;
       }
     }
 
@@ -274,7 +330,12 @@
 </header>
 
 <nav>
-  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+  <div class="menu-toggle" onclick="toggleMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
 
   <div class="nav-links">
     <a href="#geschichte">Geschichte</a>
@@ -487,7 +548,10 @@ async function renderHero() {
 }
 
 function toggleMenu() {
-  document.querySelector(".nav-links").classList.toggle("open");
+  const nav = document.querySelector('.nav-links');
+  const toggle = document.querySelector('.menu-toggle');
+  nav.classList.toggle('open');
+  toggle.classList.toggle('open');
 }
 
 async function listFiles(folderId) {
