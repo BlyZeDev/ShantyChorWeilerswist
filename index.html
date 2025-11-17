@@ -18,19 +18,61 @@
       color: white;
       padding: 1rem;
     }
+
     nav {
       background: #003366;
       padding: 0.75rem;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: nowrap;
     }
+
+    .menu-toggle {
+      display: none;
+      font-size: 2rem;
+      color: white;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
     nav a {
       color: white;
-      margin: 0 1rem;
       text-decoration: none;
       font-weight: bold;
     }
-    nav a:hover {
-      text-decoration: underline;
+
+    @media (max-width: 700px) {
+      nav {
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background: #003366;
+        margin-top: 0.5rem;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .nav-links a {
+        padding: 1rem;
+        border-top: 1px solid rgba(255,255,255,0.15);
+      }
+
+      .nav-links.open {
+        display: flex;
+      }
     }
+
     main {
       padding: 0 5vw;
     }
@@ -232,10 +274,14 @@
 </header>
 
 <nav>
-  <a href="#geschichte">Geschichte</a>
-  <a href="#termine">Termine</a>
-  <a href="#auftritte">Auftritte</a>
-  <a href="#kontakt">Kontakt</a>
+  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+
+  <div class="nav-links">
+    <a href="#geschichte">Geschichte</a>
+    <a href="#termine">Termine</a>
+    <a href="#auftritte">Auftritte</a>
+    <a href="#kontakt">Kontakt</a>
+  </div>
 </nav>
 
 <main>
@@ -388,7 +434,7 @@
     <div class="google-form-container">
       <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeM-pz5pZ2yrcjuGLIXXW9zoe_5TF-tZN645P0ZEf1pw2v5MA/viewform?embedded=true"
               width="100%"
-              height="800"
+              height="1000"
               frameborder="0"
               scrolling="no">
               Wird geladen…
@@ -438,6 +484,10 @@ async function renderHero() {
   heroContainer.innerHTML = `
     <img class="hero-image" src="https://lh3.googleusercontent.com/d/${HERO_ID}=w2000" alt="${name}">
     <div class="caption">${name}</div>`;
+}
+
+function toggleMenu() {
+  document.querySelector(".nav-links").classList.toggle("open");
 }
 
 async function listFiles(folderId) {
