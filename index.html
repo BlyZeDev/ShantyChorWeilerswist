@@ -298,6 +298,36 @@
       background: rgba(0,0,0,0.5);
     }
 
+    .kontakt-button {
+      display: inline-block;
+      margin-top: 1.5rem;
+      padding: 0.8rem 1.6rem;
+      background: #003366;
+      color: #fff !important;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      transition: 0.25s ease;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    }
+
+    .kontakt-button:hover {
+      background: #0052a1;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.22);
+    }
+
+    #kontakt h2 {
+      color: #003366;
+    }
+
+    #kontakt {
+      text-align: center;
+      max-width: 800px;
+      margin: auto;
+    }
+
     #scrollTopBtn {
       position: fixed;
       bottom: 20px;
@@ -485,23 +515,16 @@
     <div id="photoGallery" class="gallery">Lade Inhalte…</div>
   </section>
 
-  <section id="kontakt">
+  <section id="kontakt" style="padding: 2rem 0;">
     <h2>Kontakt</h2>
 
-    <p>
-      Sie möchten uns eine Nachricht schicken?
-    </p>
+    <p>Für Auftrittsanfragen, Nachrichten oder organisatorische Fragen nutzen Sie bitte unser Kontaktformular.</p>
 
-    <div class="google-form-container" style="height: 100vh;">
-      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeM-pz5pZ2yrcjuGLIXXW9zoe_5TF-tZN645P0ZEf1pw2v5MA/viewform?embedded=true"
-              width="100%"
-              height="100%"
-              frameborder="0"
-              marginwidth="0"
-              marginheight="0">
-              Wird geladen…
-      </iframe>
-    </div>
+    <a href="https://forms.gle/xqpVeVfdwa6BnNEeA"
+      target="_blank"
+      class="kontakt-button">
+      Kontaktformular öffnen
+    </a>
   </section>
 </main>
 
