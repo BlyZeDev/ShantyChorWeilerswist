@@ -88,6 +88,14 @@
     .nav-left { left:20px; }
     .nav-right { right:20px; }
 
+    .folder-description {
+      margin-top: 6px;
+      font-size: 0.85rem;
+      color: #555;
+      white-space: pre-line;
+    }
+
+
     .close-btn {
       position:absolute;
       top:20px; right:30px;
@@ -137,6 +145,20 @@ async function listFiles(folderId) {
   return (await fetch(url)).json().then(d => d.files || []);
 }
 
+async function getFolderDescription(folderId) {
+  const query = `'${folderId}' in parents and name = 'beschreibung.txt' and trashed = false`;
+  const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name)&key=${API_KEY}`;
+  const res = await fetch(url);
+  const data = await res.json();
+
+  if (!data.files || data.files.length === 0) return ""; 
+
+  const fileId = data.files[0].id;
+  const textUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`;
+  
+  return fetch(textUrl).then(r => r.text()).catch(() => "");
+}
+
 function renderFolder(folderId) {
   const gallery = document.getElementById("photoGallery");
   gallery.innerHTML = "Lade Inhalte…";
@@ -161,11 +183,22 @@ function renderFolder(folderId) {
       const name = removeExtension(f.name);
 
       if (f.mimeType === "application/vnd.google-apps.folder") {
-        div.innerHTML = `
-          <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png" style="width:60%;opacity:0.8;">
-          <div class="caption">${name}</div>`;
-        div.onclick = () => { folderStack.push(f.id); renderFolder(f.id); };
+        const folderDiv = div;
+
+        getFolderDescription(f.id).then(desc => {
+          folderDiv.innerHTML = `
+            <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png" style="width:60%;opacity:0.8;">
+            <div class="caption"><strong>${name}</strong></div>
+            ${desc ? `<div class="folder-description">${desc}</div>` : ""}
+          `;
+        });
+
+        div.onclick = () => { 
+          folderStack.push(f.id); 
+          renderFolder(f.id); 
+        };
       }
+
 
       else if (f.mimeType.startsWith("image/")) {
         div.innerHTML = `
