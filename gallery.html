@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <title>Bildergalerie – Shanty Chor Blaue Jungs Weilerswist 1996 e.V.</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      background: #fafafa;
+      text-align: center;
+    }
+    header {
+      background: navy;
+      color: white;
+      padding: 1rem;
+    }
+
+    h2 { color:#003366; }
+
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      max-width: 1200px;
+      margin: auto;
+      padding: 2rem;
+    }
+
+    .media-item {
+      width: calc(33% - 20px);
+      max-width: 350px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      padding: 10px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .media-item:hover {
+      transform: scale(1.03);
+    }
+
+    .media-item img, .media-item iframe {
+      width: 100%;
+      border-radius: 8px;
+    }
+
+    @media(max-width:800px){ .media-item{ width:48%; } }
+    @media(max-width:500px){ .media-item{ width:100%; } }
+
+    .back-btn {
+      display: inline-block;
+      margin: 1rem;
+      padding: 0.6rem 1.2rem;
+      background:#003366;
+      color:white;
+      border-radius:8px;
+      text-decoration:none;
+    }
+
+    #lightbox {
+      display:none;
+      position:fixed;
+      top:0; left:0;
+      width:100%; height:100%;
+      background:rgba(0,0,0,0.95);
+      z-index:9999;
+      justify-content:center;
+      align-items:center;
+    }
+
+    .nav-arrow {
+      position:absolute;
+      top:50%;
+      transform:translateY(-50%);
+      color:white;
+      font-size:2.5rem;
+      cursor:pointer;
+      padding:10px;
+    }
+    .nav-left { left:20px; }
+    .nav-right { right:20px; }
+
+    .close-btn {
+      position:absolute;
+      top:20px; right:30px;
+      font-size:2rem;
+      cursor:pointer;
+      color:white;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Bildergalerie</h1>
+</header>
+
+<a href="index.html" class="back-btn">← Zurück zur Startseite</a>
+
+<h2>Unsere Auftritte</h2>
+
+<div id="photoGallery" class="gallery">Lade Inhalte…</div>
+
+<div id="lightbox">
+  <span class="close-btn" onclick="closeLightbox(event)">✕</span>
+  <span class="nav-arrow nav-left" onclick="prevItem(event)">❮</span>
+  <span class="nav-arrow nav-right" onclick="nextItem(event)">❯</span>
+  <img id="lightbox-img" style="display:none;">
+  <iframe id="lightbox-vid" style="display:none;" allowfullscreen></iframe>
+</div>
+
+<script>
+const API_KEY = "AIzaSyDEcx7ykFSsLv2t-qegaNu4Uy540LpgDbQ";
+const ROOT_FOLDER_ID = "1v4HNqreRXUlOIWu9Xy9q35hjQ299Cuv3";
+
+let folderStack = [ROOT_FOLDER_ID];
+let currentFiles = [];
+let viewableFiles = [];
+let currentIndex = 0;
+
+function removeExtension(name) {
+  return name.replace(/\.[^/.]+$/, "");
+}
+
+async function listFiles(folderId) {
+  const q = `'${folderId}' in parents and trashed = false`;
+  const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name,mimeType)&key=${API_KEY}`;
+  return (await fetch(url)).json().then(d => d.files || []);
+}
+
+function renderFolder(folderId) {
+  const gallery = document.getElementById("photoGallery");
+  gallery.innerHTML = "Lade Inhalte…";
+
+  listFiles(folderId).then(files => {
+    currentFiles = files;
+    viewableFiles = files.filter(f => f.mimeType !== "application/vnd.google-apps.folder");
+
+    gallery.innerHTML = "";
+
+    if (folderStack.length > 1) {
+      const back = document.createElement("a");
+      back.className = "back-btn";
+      back.textContent = "← Zurück";
+      back.onclick = () => { folderStack.pop(); renderFolder(folderStack.at(-1)); };
+      gallery.appendChild(back);
+    }
+
+    for (let f of files) {
+      const div = document.createElement("div");
+      div.className = "media-item";
+      const name = removeExtension(f.name);
+
+      if (f.mimeType === "application/vnd.google-apps.folder") {
+        div.innerHTML = `
+          <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png" style="width:60%;opacity:0.8;">
+          <div class="caption">${name}</div>`;
+        div.onclick = () => { folderStack.push(f.id); renderFolder(f.id); };
+      }
+
+      else if (f.mimeType.startsWith("image/")) {
+        div.innerHTML = `
+          <img src="https://lh3.googleusercontent.com/d/${f.id}=w1000">
+          <div class="caption">${name}</div>`;
+        div.onclick = () => openLightbox(f.id);
+      }
+
+      else if (f.mimeType.startsWith("video/") || f.name.endsWith(".mp4")) {
+        div.innerHTML = `
+          <iframe src="https://drive.google.com/file/d/${f.id}/preview"></iframe>
+          <div class="caption">${name}</div>`;
+        div.onclick = () => openLightbox(f.id);
+      }
+
+      gallery.appendChild(div);
+    }
+  });
+}
+
+function openLightbox(id) {
+  const f = viewableFiles.find(x => x.id === id);
+  currentIndex = viewableFiles.indexOf(f);
+
+  const lb = document.getElementById("lightbox");
+  const img = document.getElementById("lightbox-img");
+  const vid = document.getElementById("lightbox-vid");
+
+  if (f.mimeType.startsWith("image/")) {
+    img.src = `https://lh3.googleusercontent.com/d/${f.id}=w2400`;
+    img.style.display = "block";
+    vid.style.display = "none";
+  } else {
+    vid.src = `https://drive.google.com/file/d/${f.id}/preview`;
+    vid.style.display = "block";
+    img.style.display = "none";
+  }
+
+  lb.style.display = "flex";
+}
+
+function closeLightbox(e) {
+  e.stopPropagation();
+  document.getElementById("lightbox").style.display = "none";
+  document.getElementById("lightbox-vid").src = "";
+}
+
+function nextItem(e) {
+  e.stopPropagation();
+  currentIndex = (currentIndex + 1) % viewableFiles.length;
+  openLightbox(viewableFiles[currentIndex].id);
+}
+
+function prevItem(e) {
+  e.stopPropagation();
+  currentIndex = (currentIndex - 1 + viewableFiles.length) % viewableFiles.length;
+  openLightbox(viewableFiles[currentIndex].id);
+}
+
+document.getElementById("lightbox").addEventListener("click", closeLightbox);
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderFolder(ROOT_FOLDER_ID);
+});
+</script>
+
+</body>
+</html>
