@@ -142,7 +142,6 @@
   <a href="index.html" class="back-btn">← Zurück zur Startseite</a>
 
   <article class="beschreibung-text">
-    <h2>Unsere Auftritte</h2>
     <div id="folderDescription"></div>
   </article>
 
@@ -190,80 +189,73 @@ async function getFolderDescription(folderId) {
   return fetch(textUrl).then(r => r.text()).catch(() => "");
 }
 
-function renderFolder(folderId) {
+async function renderFolder(folderId) {
   const gallery = document.getElementById("photoGallery");
   const descBox = document.getElementById("folderDescription");
   
   gallery.innerHTML = "Lade Inhalte…";
   descBox.innerHTML = "";
 
-  listFiles(folderId).then(async files => {
-    currentFiles = files;
+  const files = await listFiles(folderId);
+  currentFiles = files;
 
-    // nur Medien anzeigen, description.txt ignorieren
-    viewableFiles = files.filter(f => 
-      f.mimeType !== "application/vnd.google-apps.folder" &&
-      f.name !== "beschreibung.txt"
-    );
+  viewableFiles = files.filter(f => 
+    f.mimeType !== "application/vnd.google-apps.folder" &&
+    f.name !== "beschreibung.txt"
+  );
 
-    gallery.innerHTML = "";
+  gallery.innerHTML = "";
 
-    if (folderStack.length > 1) {
-      const back = document.createElement("a");
-      back.className = "back-btn";
-      back.textContent = "← Zurück";
-      back.onclick = () => { folderStack.pop(); renderFolder(folderStack.at(-1)); };
-      gallery.appendChild(back);
+  const folderName = removeExtension(await getFolderName(folderId));
+  let descriptionHTML = `<article><h3>${folderName}</h3>`;
 
-      const folderTitle = removeExtension(files.find(f => f.mimeType === "application/vnd.google-apps.folder")?.name || "");
-      const desc = await getFolderDescription(folderId);
+  const desc = await getFolderDescription(folderId);
+  if (desc.trim() !== "") {
+    const formatted = desc
+      .replace(/\r/g, "")
+      .split("\n\n")
+      .map(p => `<p>${p.replace(/\n/g, "<br>")}</p>`)
+      .join("");
+    descriptionHTML += formatted;
+  }
 
-      if (desc.trim() !== "") {
-        const formatted = desc
-          .replace(/\r/g, "")
-          .split("\n\n")
-          .map(p => `<p>${p.replace(/\n/g, "<br>")}</p>`)
-          .join("");
+  descriptionHTML += `</article>`;
+  descBox.innerHTML = descriptionHTML;
 
-        descBox.innerHTML = `
-          <article>
-            <h3>${removeExtension((await getFolderName(folderId)))}</h3>
-            ${formatted}
-          </article>`;
-      }
+  if (folderStack.length > 1) {
+    const back = document.createElement("a");
+    back.className = "back-btn";
+    back.textContent = "← Zurück";
+    back.onclick = () => { folderStack.pop(); renderFolder(folderStack.at(-1)); };
+    gallery.appendChild(back);
+  }
+
+  for (let f of files) {
+    if (f.name === "beschreibung.txt") continue;
+
+    const div = document.createElement("div");
+    div.className = "media-item";
+    const name = removeExtension(f.name);
+
+    if (f.mimeType === "application/vnd.google-apps.folder") {
+      div.innerHTML = `
+        <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png" style="width:60%;opacity:0.8;">
+        <div class="caption">${name}</div>`;
+      div.onclick = () => { folderStack.push(f.id); renderFolder(f.id); };
+    } else if (f.mimeType.startsWith("image/")) {
+      div.innerHTML = `
+        <img src="https://lh3.googleusercontent.com/d/${f.id}=w1000">
+        <div class="caption">${name}</div>`;
+      div.onclick = () => openLightbox(f.id);
+    } else if (f.mimeType.startsWith("video/") || f.name.endsWith(".mp4")) {
+      div.innerHTML = `
+        <iframe src="https://drive.google.com/file/d/${f.id}/preview"></iframe>
+        <div class="caption">${name}</div>`;
+      div.onclick = () => openLightbox(f.id);
     }
 
-    for (let f of files) {
-      if (f.name === "beschreibung.txt") continue;
-
-      const div = document.createElement("div");
-      div.className = "media-item";
-      const name = removeExtension(f.name);
-
-      if (f.mimeType === "application/vnd.google-apps.folder") {
-        div.innerHTML = `
-          <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png" style="width:60%;opacity:0.8;">
-          <div class="caption">${name}</div>`;
-        div.onclick = () => { folderStack.push(f.id); renderFolder(f.id); };
-      }
-
-      else if (f.mimeType.startsWith("image/")) {
-        div.innerHTML = `
-          <img src="https://lh3.googleusercontent.com/d/${f.id}=w1000">
-          <div class="caption">${name}</div>`;
-        div.onclick = () => openLightbox(f.id);
-      }
-
-      else if (f.mimeType.startsWith("video/") || f.name.endsWith(".mp4")) {
-        div.innerHTML = `
-          <iframe src="https://drive.google.com/file/d/${f.id}/preview"></iframe>
-          <div class="caption">${name}</div>`;
-        div.onclick = () => openLightbox(f.id);
-      }
-
-      gallery.appendChild(div);
-    }
-  });
+    gallery.appendChild(div);
+  }
 }
 
 async function getFolderName(id) {
