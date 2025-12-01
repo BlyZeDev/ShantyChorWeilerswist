@@ -88,17 +88,24 @@
     .nav-left { left:20px; }
     .nav-right { right:20px; }
 
-    #folderDescription {
+    .close-btn {
+      position:absolute;
+      top:20px; right:30px;
+      font-size:2rem;
+      cursor:pointer;
+      color:white;
+    }
+
+    /* --- Styled like "Unsere Geschichte" --- */
+
+    #folderDescription article {
       max-width: 900px;
-      margin: 30px auto 10px auto;
-      padding: 25px 30px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      font-size: 1.05rem;
+      margin: 30px auto;
+      padding: 0 20px;
+      text-align: left;
+      font-size: 1rem;
       line-height: 1.7;
       color: #333;
-      text-align: center; /* Text komplett zentriert */
     }
 
     #folderDescription h3 {
@@ -107,15 +114,7 @@
     }
 
     #folderDescription p {
-      margin: 10px 0;
-    }
-
-    .close-btn {
-      position:absolute;
-      top:20px; right:30px;
-      font-size:2rem;
-      cursor:pointer;
-      color:white;
+      margin: 16px 0;
     }
   </style>
 </head>
@@ -129,7 +128,9 @@
 <a href="index.html" class="back-btn">← Zurück zur Startseite</a>
 
 <h2>Unsere Auftritte</h2>
-<div id="folderDescription" style="max-width:900px;margin:20px auto;text-align:left;line-height:1.6;font-size:1rem;color:#333;"></div>
+
+<!-- Hier kommt der Beschreibungstext + Titel -->
+<div id="folderDescription"></div>
 
 <div id="photoGallery" class="gallery">Lade Inhalte…</div>
 
@@ -183,7 +184,12 @@ function renderFolder(folderId) {
 
   listFiles(folderId).then(async files => {
     currentFiles = files;
-    viewableFiles = files.filter(f => f.mimeType !== "application/vnd.google-apps.folder" && f.name !== "beschreibung.txt");
+
+    // nur Medien anzeigen, description.txt ignorieren
+    viewableFiles = files.filter(f => 
+      f.mimeType !== "application/vnd.google-apps.folder" &&
+      f.name !== "beschreibung.txt"
+    );
 
     gallery.innerHTML = "";
 
@@ -194,7 +200,9 @@ function renderFolder(folderId) {
       back.onclick = () => { folderStack.pop(); renderFolder(folderStack.at(-1)); };
       gallery.appendChild(back);
 
+      const folderTitle = removeExtension(files.find(f => f.mimeType === "application/vnd.google-apps.folder")?.name || "");
       const desc = await getFolderDescription(folderId);
+
       if (desc.trim() !== "") {
         const formatted = desc
           .replace(/\r/g, "")
@@ -202,7 +210,11 @@ function renderFolder(folderId) {
           .map(p => `<p>${p.replace(/\n/g, "<br>")}</p>`)
           .join("");
 
-        descBox.innerHTML = `<article>${formatted}</article>`;
+        descBox.innerHTML = `
+          <article>
+            <h3>${removeExtension((await getFolderName(folderId)))}</h3>
+            ${formatted}
+          </article>`;
       }
     }
 
@@ -237,6 +249,13 @@ function renderFolder(folderId) {
       gallery.appendChild(div);
     }
   });
+}
+
+async function getFolderName(id) {
+  const url = `https://www.googleapis.com/drive/v3/files/${id}?fields=name&key=${API_KEY}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  return data.name || "";
 }
 
 function openLightbox(id) {
