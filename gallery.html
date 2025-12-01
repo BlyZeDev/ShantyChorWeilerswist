@@ -237,20 +237,24 @@ async function renderFolder(folderId) {
     div.className = "media-item";
     const name = removeExtension(f.name);
 
+    const showCaption = /\D/.test(name);
+
     if (f.mimeType === "application/vnd.google-apps.folder") {
       div.innerHTML = `
         <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png" style="width:60%;opacity:0.8;">
         <div class="caption">${name}</div>`;
       div.onclick = () => { folderStack.push(f.id); renderFolder(f.id); };
-    } else if (f.mimeType.startsWith("image/")) {
+    } 
+    else if (f.mimeType.startsWith("image/")) {
       div.innerHTML = `
         <img src="https://lh3.googleusercontent.com/d/${f.id}=w1000">
-        <div class="caption">${name}</div>`;
+        ${showCaption ? `<div class="caption">${name}</div>` : ''}`;
       div.onclick = () => openLightbox(f.id);
-    } else if (f.mimeType.startsWith("video/") || f.name.endsWith(".mp4")) {
+    } 
+    else if (f.mimeType.startsWith("video/") || f.name.endsWith(".mp4")) {
       div.innerHTML = `
         <iframe src="https://drive.google.com/file/d/${f.id}/preview"></iframe>
-        <div class="caption">${name}</div>`;
+        ${showCaption ? `<div class="caption">${name}</div>` : ''}`;
       div.onclick = () => openLightbox(f.id);
     }
 
