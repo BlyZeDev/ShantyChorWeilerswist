@@ -115,6 +115,7 @@
 <a href="index.html" class="back-btn">← Zurück zur Startseite</a>
 
 <h2>Unsere Auftritte</h2>
+<div id="folderDescription" style="max-width:900px;margin:20px auto;text-align:left;line-height:1.6;font-size:1rem;color:#333;"></div>
 
 <div id="photoGallery" class="gallery">Lade Inhalte…</div>
 
@@ -161,9 +162,12 @@ async function getFolderDescription(folderId) {
 
 function renderFolder(folderId) {
   const gallery = document.getElementById("photoGallery");
+  const descBox = document.getElementById("folderDescription");
+  
   gallery.innerHTML = "Lade Inhalte…";
+  descBox.innerHTML = "";
 
-  listFiles(folderId).then(files => {
+  listFiles(folderId).then(async files => {
     currentFiles = files;
     viewableFiles = files.filter(f => f.mimeType !== "application/vnd.google-apps.folder");
 
@@ -175,6 +179,11 @@ function renderFolder(folderId) {
       back.textContent = "← Zurück";
       back.onclick = () => { folderStack.pop(); renderFolder(folderStack.at(-1)); };
       gallery.appendChild(back);
+
+      const desc = await getFolderDescription(folderId);
+      if (desc.trim() !== "") {
+        descBox.innerHTML = `<article>${desc.replace(/\n/g, "<br>")}</article>`;
+      }
     }
 
     for (let f of files) {
@@ -183,22 +192,11 @@ function renderFolder(folderId) {
       const name = removeExtension(f.name);
 
       if (f.mimeType === "application/vnd.google-apps.folder") {
-        const folderDiv = div;
-
-        getFolderDescription(f.id).then(desc => {
-          folderDiv.innerHTML = `
-            <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png" style="width:60%;opacity:0.8;">
-            <div class="caption"><strong>${name}</strong></div>
-            ${desc ? `<div class="folder-description">${desc}</div>` : ""}
-          `;
-        });
-
-        div.onclick = () => { 
-          folderStack.push(f.id); 
-          renderFolder(f.id); 
-        };
+        div.innerHTML = `
+          <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png" style="width:60%;opacity:0.8;">
+          <div class="caption">${name}</div>`;
+        div.onclick = () => { folderStack.push(f.id); renderFolder(f.id); };
       }
-
 
       else if (f.mimeType.startsWith("image/")) {
         div.innerHTML = `
@@ -207,6 +205,7 @@ function renderFolder(folderId) {
         div.onclick = () => openLightbox(f.id);
       }
 
+      // 🔹 VIDEO
       else if (f.mimeType.startsWith("video/") || f.name.endsWith(".mp4")) {
         div.innerHTML = `
           <iframe src="https://drive.google.com/file/d/${f.id}/preview"></iframe>
