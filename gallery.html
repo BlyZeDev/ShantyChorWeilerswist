@@ -132,22 +132,23 @@
   <h1>Bildergalerie</h1>
 </header>
 
-<a href="index.html" class="back-btn">← Zurück zur Startseite</a>
+<main>
+  <a href="index.html" class="back-btn">← Zurück zur Startseite</a>
 
-<h2>Unsere Auftritte</h2>
+  <h2>Unsere Auftritte</h2>
 
-<!-- Hier kommt der Beschreibungstext + Titel -->
-<div id="folderDescription"></div>
+  <div id="folderDescription"></div>
 
-<div id="photoGallery" class="gallery">Lade Inhalte…</div>
+  <div id="photoGallery" class="gallery">Lade Inhalte…</div>
 
-<div id="lightbox">
-  <span class="close-btn" onclick="closeLightbox(event)">✕</span>
-  <span class="nav-arrow nav-left" onclick="prevItem(event)">❮</span>
-  <span class="nav-arrow nav-right" onclick="nextItem(event)">❯</span>
-  <img id="lightbox-img" style="display:none;">
-  <iframe id="lightbox-vid" style="display:none;" allowfullscreen></iframe>
-</div>
+  <div id="lightbox">
+    <span class="close-btn" onclick="closeLightbox(event)">✕</span>
+    <span class="nav-arrow nav-left" onclick="prevItem(event)">❮</span>
+    <span class="nav-arrow nav-right" onclick="nextItem(event)">❯</span>
+    <img id="lightbox-img" style="display:none;">
+    <iframe id="lightbox-vid" style="display:none;" allowfullscreen></iframe>
+  </div>
+</main>
 
 <script>
 const API_KEY = "AIzaSyDEcx7ykFSsLv2t-qegaNu4Uy540LpgDbQ";
