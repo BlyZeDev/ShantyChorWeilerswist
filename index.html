@@ -181,6 +181,15 @@
       border-radius: 12px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.25);
     }
+
+    .banner-image {
+      width: 100%;
+      max-width: 1000px;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+      margin-bottom: 1rem;
+    }
+
     .caption {
       font-size: 0.9rem;
       color: #333;
@@ -420,6 +429,7 @@
 <main>
   <section id="geschichte">
     <h2>Unsere Geschichte</h2>
+    <div id="bannerContainer"></div>
     <div id="heroContainer"></div>
 
     <article class="geschichte-text">
@@ -595,6 +605,7 @@
 const API_KEY = "AIzaSyDEcx7ykFSsLv2t-qegaNu4Uy540LpgDbQ";
 const ROOT_FOLDER_ID = "1v4HNqreRXUlOIWu9Xy9q35hjQ299Cuv3";
 const HERO_ID = "1dOky7LzC6RWT_st_5G1zjsIzZl__cVG8";
+const BANNER_ID = "1Ud6MIstaReNBy7oB23oMh210lnemXuln";
 
 let folderStack = [ROOT_FOLDER_ID];
 let currentFiles = [];
@@ -618,6 +629,19 @@ async function renderHero() {
   heroContainer.innerHTML = `
     <img class="hero-image" src="https://lh3.googleusercontent.com/d/${HERO_ID}=w2000" alt="${name}">
     <div class="caption">${name}</div>`;
+}
+
+async function renderBanner() {
+  const bannerContainer = document.getElementById("bannerContainer");
+  if (!bannerContainer) return;
+
+  const name = await getFileName(BANNER_ID);
+
+  bannerContainer.innerHTML = `
+  <a href="#termine">
+    <img class="banner-image" src="https://lh3.googleusercontent.com/d/${BANNER_ID}=w2000" alt="${name}">
+  </a>
+  <div class="caption">${name}</div>`;
 }
 
 function toggleMenu() {
@@ -747,6 +771,12 @@ scrollBtn.addEventListener("click", () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
+  const eventDate = new Date("2026-07-18T23:59:59");
+
+  if (new Date() <= eventDate) {
+    renderBanner();
+  }
+
   renderHero();
   renderFolder(ROOT_FOLDER_ID);
 });
