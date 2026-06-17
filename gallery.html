@@ -344,10 +344,7 @@ function openLightbox(id) {
   if (viewableFiles.length <= 1) {
     arrows.forEach(x => x.style.display = "none");
   } else {
-    document.body.classList.toggle(
-      "single-item-gallery",
-      viewableFiles.length <= 1
-    );
+    arrows.forEach(x => x.style.display = "");
   }
 
   const f = viewableFiles.find(x => x.id === id);
@@ -505,13 +502,15 @@ let lastTap = 0;
 
 lightboxImg.addEventListener("touchend", e => {
 
+  const wasPinching = isPinching;
+
   if (e.touches.length < 2) {
     isPinching = false;
   }
 
   isDragging = false;
 
-  if (isPinching)
+  if (wasPinching)
     return;
 
   const touch = e.changedTouches[0];
@@ -557,14 +556,6 @@ lightboxImg.addEventListener("touchstart", e => {
 
   initialDistance = Math.hypot(dx, dy);
   initialZoom = zoom;
-});
-
-lightboxImg.addEventListener("touchend", e => {
-  if (e.touches.length < 2) {
-    isPinching = false;
-  }
-
-  isDragging = false;
 });
 
 lightboxImg.addEventListener("touchmove", e => {
