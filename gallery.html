@@ -85,6 +85,23 @@
       align-items:center;
     }
 
+    #lightbox-img {
+      max-width: 95vw;
+      max-height: 95vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      cursor: grab;
+      user-select: none;
+      transform-origin: center center;
+    }
+
+    #lightbox-vid {
+      width: 95vw;
+      height: 95vh;
+      border: none;
+    }
+
     .nav-arrow {
       position:absolute;
       top:50%;
@@ -164,6 +181,13 @@ let folderStack = [ROOT_FOLDER_ID];
 let currentFiles = [];
 let viewableFiles = [];
 let currentIndex = 0;
+
+let zoom = 1;
+let panX = 0;
+let panY = 0;
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
 
 function removeExtension(name) {
   return name.replace(/\.[^/.]+$/, "");
@@ -278,9 +302,15 @@ function openLightbox(id) {
   const vid = document.getElementById("lightbox-vid");
 
   if (f.mimeType.startsWith("image/")) {
+    zoom = 1;
+    panX = 0;
+    panY = 0;
+
     img.src = `https://lh3.googleusercontent.com/d/${f.id}=w2400`;
     img.style.display = "block";
     vid.style.display = "none";
+
+    updateImageTransform();
   } else {
     vid.src = `https://drive.google.com/file/d/${f.id}/preview`;
     vid.style.display = "block";
@@ -288,6 +318,12 @@ function openLightbox(id) {
   }
 
   lb.style.display = "flex";
+}
+
+function updateImageTransform() {
+  const img = document.getElementById("lightbox-img");
+  img.style.transform =
+    `translate(${panX}px, ${panY}px) scale(${zoom})`;
 }
 
 function closeLightbox(e) {
@@ -312,6 +348,58 @@ document.getElementById("lightbox").addEventListener("click", closeLightbox);
 
 document.addEventListener("DOMContentLoaded", () => {
   renderFolder(ROOT_FOLDER_ID);
+});
+
+const lightboxImg = document.getElementById("lightbox-img");
+
+lightboxImg.addEventListener("wheel", e => {
+  e.preventDefault();
+
+  const factor = e.deltaY < 0 ? 1.1 : 0.9;
+
+  zoom *= factor;
+  zoom = Math.max(1, Math.min(zoom, 10));
+
+  updateImageTransform();
+});
+
+lightboxImg.addEventListener("mousedown", e => {
+  if (zoom <= 1) return;
+
+  isDragging = true;
+  dragStartX = e.clientX - panX;
+  dragStartY = e.clientY - panY;
+
+  lightboxImg.style.cursor = "grabbing";
+});
+
+document.addEventListener("mousemove", e => {
+  if (!isDragging) return;
+
+  panX = e.clientX - dragStartX;
+  panY = e.clientY - dragStartY;
+
+  updateImageTransform();
+});
+
+document.addEventListener("mouseup", () => {
+  isDragging = false;
+  lightboxImg.style.cursor = "grab";
+});
+
+lightboxImg.addEventListener("click", e => {
+  e.stopPropagation();
+});
+
+document.getElementById("lightbox-vid").addEventListener("click", e => {
+  e.stopPropagation();
+});
+
+lightboxImg.addEventListener("dblclick", () => {
+  zoom = 1;
+  panX = 0;
+  panY = 0;
+  updateImageTransform();
 });
 </script>
 
