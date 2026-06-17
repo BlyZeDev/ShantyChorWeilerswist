@@ -647,22 +647,17 @@ function toggleMenu() {
   document.querySelector(".menu-toggle").classList.toggle("open");
 }
 
-const CAL_BASE = "https://calendar.google.com/calendar/embed?wkst=1&ctz=Europe%2FBerlin&showPrint=0&src=c2hhbnR5Y2hvcndlaWxlcnN3aXN0QGdtYWlsLmNvbQ&color=%23039be5";
-
 function scaleCalendar() {
-  const wrapper  = document.querySelector('.calendar-wrapper');
-  const iframe   = wrapper.querySelector('iframe');
-  const isMobile = window.innerWidth <= 700;
-
-  if (isMobile) {
-    if (!iframe.src.includes('AGENDA')) iframe.src = CAL_BASE + "&mode=AGENDA&height=480";
-    iframe.style.cssText  = 'width:100%;height:480px;';
-    wrapper.style.height  = '';
-  } else {
-    if (iframe.src.includes('AGENDA')) iframe.src = CAL_BASE + "&height=600";
+  const wrapper = document.querySelector('.calendar-wrapper');
+  const iframe  = wrapper.querySelector('iframe');
+  if (window.innerWidth <= 700) {
     const scale = wrapper.offsetWidth / 800;
-    iframe.style.cssText  = `width:800px;height:650px;transform:scale(${scale});transform-origin:top left;margin-bottom:${(650 * scale) - 650}px;`;
-    wrapper.style.height  = `${650 * scale}px`;
+    iframe.style.transform    = `scale(${scale})`;
+    iframe.style.marginBottom = `${(650 * scale) - 650}px`;
+    wrapper.style.height      = `${650 * scale}px`;
+  } else {
+    iframe.style.cssText = '';
+    wrapper.style.height = '';
   }
 }
 
