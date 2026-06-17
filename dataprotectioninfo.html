@@ -7,62 +7,501 @@
   <title>Datenschutz – Shanty Chor Blaue Jungs Weilerswist 1996 e.V.</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
   <style>
+    /* ── Tokens ──────────────────────────────────────────────── */
+    :root {
+      --navy:    #002147;
+      --navy-lt: #003166;
+      --gold:    #c8a96e;
+      --bg:      #f4f6f9;
+      --card-bg: #ffffff;
+      --text:    #1a1a2e;
+      --muted:   #6b7280;
+      --radius:  12px;
+      --shadow:  0 2px 10px rgba(0,0,0,.10);
+      --trans:   0.2s ease;
+    }
+
+    /* ── Reset / base ────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-        margin: 0;
-        background: #fafafa;
-        font-family: sans-serif;
-        text-align: center;
+      font-family: 'Lato', sans-serif;
+      font-size: 1.05rem;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
     }
 
-    .container {
-        max-width: 1000px;
-        margin: auto;
-        padding: 2rem 1rem;
+    /* ── Header ──────────────────────────────────────────────── */
+    header {
+      background: var(--navy);
+      color: #fff;
+      padding: 2rem 1rem 0;
+      text-align: center;
+      overflow: hidden;
     }
 
-    h1 {
-        color: #003366;
-        margin-bottom: 1rem;
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.4rem, 3.5vw, 2rem);
+      letter-spacing: .03em;
     }
 
-    .pdf-wrapper {
-        width: 100%;
-        height: 90vh;
-        border: 2px solid #ccc;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    .wave {
+      display: block;
+      width: calc(100% + 2rem);
+      height: 48px;
+      margin-top: 1rem;
+      margin-left: -1rem;
     }
 
-    iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
+    /* ── Main ────────────────────────────────────────────────── */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 1.5rem 5vw 3rem;
     }
 
+    /* ── Back button ─────────────────────────────────────────── */
     .back-btn {
-        display: inline-block;
-        margin: 1rem;
-        padding: 0.6rem 1.2rem;
-        background:#003366;
-        color:white;
-        border-radius:8px;
-        text-decoration:none;
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .5rem 1.1rem;
+      background: var(--navy);
+      color: #fff;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: .9rem;
+      font-weight: 700;
+      letter-spacing: .03em;
+      transition: background var(--trans);
+    }
+
+    .back-btn:hover { background: var(--navy-lt); }
+
+    /* ── Content card ────────────────────────────────────────── */
+    .privacy-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 2.4rem 2.8rem;
+      margin-top: 1.4rem;
+      text-align: left;
+    }
+
+    @media (max-width: 600px) {
+      .privacy-card { padding: 1.6rem 1.4rem; }
+    }
+
+    /* ── Typography ──────────────────────────────────────────── */
+    .privacy-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: var(--navy);
+      margin: 2rem 0 .6rem;
+      padding-left: .8rem;
+      border-left: 3px solid var(--gold);
+    }
+
+    .privacy-card h2:first-child { margin-top: 0; }
+
+    .privacy-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--navy-lt);
+      margin: 1.4rem 0 .4rem;
+    }
+
+    .privacy-card p {
+      color: var(--text);
+      line-height: 1.8;
+      margin-bottom: .8rem;
+    }
+
+    .privacy-card a {
+      color: var(--navy-lt);
+      text-decoration: none;
+      font-weight: 700;
+      transition: opacity var(--trans);
+    }
+
+    .privacy-card a:hover { opacity: .7; }
+
+    /* Definition list for contact block */
+    .meta-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: .3rem 1.2rem;
+      margin: .5rem 0 .8rem;
+    }
+
+    .meta-grid dt {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: .9rem;
+      white-space: nowrap;
+    }
+
+    .meta-grid dd {
+      color: var(--text);
+      font-size: .9rem;
+    }
+
+    /* Bullet list used in rights section */
+    .privacy-card ul {
+      list-style: none;
+      margin: .4rem 0 .8rem;
+      padding: 0;
+    }
+
+    .privacy-card ul li {
+      position: relative;
+      padding-left: 1.2rem;
+      line-height: 1.8;
+      color: var(--text);
+      margin-bottom: .2rem;
+    }
+
+    .privacy-card ul li::before {
+      content: '–';
+      position: absolute;
+      left: 0;
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid rgba(0,0,0,.07);
+      margin: 2rem 0;
     }
   </style>
 </head>
 
 <body>
 
-<div class="container">
-    <a href="index.html" class="back-btn">← Zurück zur Hauptseite</a>
-    
-    <div class="pdf-wrapper">
-        <iframe src="dataprotectioninfo.pdf" title="Datenschutz PDF"></iframe>
-    </div>
-</div>
+<header>
+  <h1>Datenschutz / DSGVO</h1>
+  <svg class="wave" viewBox="0 0 1440 48" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,24 C240,48 480,0 720,24 C960,48 1200,0 1440,24 L1440,48 L0,48 Z"
+          fill="#f4f6f9"/>
+  </svg>
+</header>
+
+<main>
+  <a href="index.html" class="back-btn">← Zurück zur Hauptseite</a>
+
+  <div class="privacy-card">
+
+    <h2>Datenschutzerklärung</h2>
+    <p>
+      Datenschutz hat einen besonders hohen Stellenwert für die Geschäftsleitung des
+      Shanty-Chor Blaue Jungs Weilerswist 1996 e.V. Eine Nutzung unserer Internetseiten ist
+      grundsätzlich ohne jede Angabe personenbezogener Daten möglich. Sofern eine betroffene
+      Person besondere Services über unsere Internetseite in Anspruch nehmen möchte, könnte
+      jedoch eine Verarbeitung personenbezogener Daten erforderlich werden. Ist dies der Fall
+      und besteht keine gesetzliche Grundlage, holen wir generell eine Einwilligung der
+      betroffenen Person ein.
+    </p>
+    <p>
+      Die Verarbeitung personenbezogener Daten erfolgt stets im Einklang mit der
+      Datenschutz-Grundverordnung (DS-GVO) und den geltenden landesspezifischen
+      Datenschutzbestimmungen. Mittels dieser Erklärung möchten wir die Öffentlichkeit über
+      Art, Umfang und Zweck der erhobenen, genutzten und verarbeiteten personenbezogenen
+      Daten informieren sowie betroffene Personen über ihre zustehenden Rechte aufklären.
+    </p>
+
+    <hr class="divider">
+
+    <h2>1. Begriffsbestimmungen</h2>
+    <p>Die folgenden Begriffe werden in dieser Datenschutzerklärung verwendet:</p>
+
+    <h3>a) Personenbezogene Daten</h3>
+    <p>
+      Alle Informationen, die sich auf eine identifizierte oder identifizierbare natürliche
+      Person beziehen — direkt oder indirekt, etwa über Namen, Kennnummern, Standortdaten
+      oder Online-Kennungen.
+    </p>
+
+    <h3>b) Betroffene Person</h3>
+    <p>Jede identifizierte oder identifizierbare natürliche Person, deren personenbezogene Daten verarbeitet werden.</p>
+
+    <h3>c) Verarbeitung</h3>
+    <p>
+      Jeder Vorgang im Zusammenhang mit personenbezogenen Daten: Erheben, Erfassen,
+      Organisieren, Speichern, Anpassen, Auslesen, Verwenden, Übermitteln, Verbreiten,
+      Einschränken, Löschen oder Vernichten.
+    </p>
+
+    <h3>d) Einschränkung der Verarbeitung</h3>
+    <p>Die Markierung gespeicherter personenbezogener Daten mit dem Ziel, ihre künftige Verarbeitung einzuschränken.</p>
+
+    <h3>e) Profiling</h3>
+    <p>
+      Automatisierte Verarbeitung personenbezogener Daten zur Bewertung bestimmter persönlicher
+      Aspekte einer natürlichen Person, insbesondere zur Analyse von Verhalten, Aufenthaltsort
+      oder wirtschaftlicher Lage.
+    </p>
+
+    <h3>f) Pseudonymisierung</h3>
+    <p>
+      Verarbeitung personenbezogener Daten in einer Weise, durch die sie ohne zusätzliche
+      Informationen keiner spezifischen Person mehr zugeordnet werden können, sofern diese
+      Zusatzinformationen gesondert aufbewahrt werden.
+    </p>
+
+    <h3>g) Verantwortlicher</h3>
+    <p>
+      Die natürliche oder juristische Person, die allein oder gemeinsam mit anderen über
+      Zwecke und Mittel der Verarbeitung von personenbezogenen Daten entscheidet.
+    </p>
+
+    <h3>h) Auftragsverarbeiter</h3>
+    <p>Eine natürliche oder juristische Person, die personenbezogene Daten im Auftrag des Verantwortlichen verarbeitet.</p>
+
+    <h3>i) Empfänger</h3>
+    <p>
+      Eine natürliche oder juristische Person, der personenbezogene Daten offengelegt werden.
+      Behörden, die im Rahmen eines gesetzlichen Untersuchungsauftrags Daten erhalten, gelten
+      nicht als Empfänger.
+    </p>
+
+    <h3>j) Dritter</h3>
+    <p>
+      Jede natürliche oder juristische Person außer der betroffenen Person, dem Verantwortlichen,
+      dem Auftragsverarbeiter und den zur Verarbeitung befugten Personen.
+    </p>
+
+    <h3>k) Einwilligung</h3>
+    <p>
+      Eine freiwillig, für einen bestimmten Fall, in informierter Weise und unmissverständlich
+      abgegebene Willensbekundung der betroffenen Person, dass sie mit der Verarbeitung ihrer
+      personenbezogenen Daten einverstanden ist.
+    </p>
+
+    <hr class="divider">
+
+    <h2>2. Verantwortlicher</h2>
+    <p>Verantwortlicher im Sinne der DS-GVO ist:</p>
+    <dl class="meta-grid">
+      <dt>Organisation</dt><dd>Shanty-Chor Blaue Jungs Weilerswist 1996 e.V.</dd>
+      <dt>Adresse</dt>     <dd>Friedrich-Ebert-Straße 13a, 53919 Weilerswist</dd>
+      <dt>Telefon</dt>     <dd><a href="tel:+4922548458785">02254 845878</a></dd>
+      <dt>E-Mail</dt>      <dd><a href="mailto:shantychorweilerswist@gmail.com">shantychorweilerswist@gmail.com</a></dd>
+      <dt>Website</dt>     <dd><a href="https://shantychorweilerswist.de">shantychorweilerswist.de</a></dd>
+    </dl>
+
+    <hr class="divider">
+
+    <h2>3. Cookies</h2>
+    <p>
+      Unsere Internetseiten verwenden Cookies — Textdateien, die über einen Browser auf einem
+      Computersystem abgelegt werden. Cookies ermöglichen es, den individuellen Browser einer
+      betroffenen Person wiederzuerkennen und nutzerfreundlichere Services bereitzustellen.
+    </p>
+    <p>
+      Die betroffene Person kann die Setzung von Cookies jederzeit über die Einstellungen des
+      genutzten Browsers verhindern oder bereits gesetzte Cookies löschen. Bei Deaktivierung
+      von Cookies sind unter Umständen nicht alle Funktionen unserer Internetseite vollumfänglich
+      nutzbar.
+    </p>
+
+    <hr class="divider">
+
+    <h2>4. Google Webfonts</h2>
+    <p>
+      Diese Seite verwendet zur Darstellung der Schrift Google Webfonts
+      (<a href="http://www.google.com/webfonts/" target="_blank" rel="noopener">google.com/webfonts</a>).
+      Beim Aufruf unserer Seite lädt Ihr Browser die benötigten Schriften in den Browsercache.
+      Weitere Informationen finden Sie unter
+      <a href="https://developers.google.com/fonts/faq?hl=de" target="_blank" rel="noopener">developers.google.com/fonts/faq</a>
+      sowie in der
+      <a href="http://www.google.com/intl/de/policies/privacy/" target="_blank" rel="noopener">Datenschutzerklärung von Google</a>.
+    </p>
+
+    <hr class="divider">
+
+    <h2>5. Erfassung allgemeiner Daten</h2>
+    <p>
+      Bei jedem Aufruf unserer Internetseite werden automatisch allgemeine Daten erfasst und
+      in Server-Logfiles gespeichert. Dazu gehören:
+    </p>
+    <ul>
+      <li>Verwendete Browsertypen und -versionen</li>
+      <li>Betriebssystem des zugreifenden Systems</li>
+      <li>Referrer (Seite, von der der Zugriff erfolgte)</li>
+      <li>Aufgerufene Unterseiten</li>
+      <li>Datum und Uhrzeit des Zugriffs</li>
+      <li>IP-Adresse</li>
+      <li>Internet-Service-Provider</li>
+    </ul>
+    <p>
+      Diese Daten werden nicht einer bestimmten Person zugeordnet. Sie dienen der korrekten
+      Auslieferung unserer Inhalte, der Optimierung unseres Angebots, der Sicherstellung der
+      Systemfunktionsfähigkeit sowie der Bereitstellung von Informationen für Strafverfolgungsbehörden
+      im Falle eines Cyberangriffs. Server-Logfiles werden getrennt von personenbezogenen Daten
+      gespeichert.
+    </p>
+
+    <hr class="divider">
+
+    <h2>6. Kontaktmöglichkeiten</h2>
+    <p>
+      Sofern eine betroffene Person per E-Mail oder über ein Kontaktformular Kontakt aufnimmt,
+      werden die übermittelten personenbezogenen Daten automatisch zum Zweck der Bearbeitung
+      gespeichert. Eine Weitergabe dieser Daten an Dritte erfolgt nicht.
+    </p>
+
+    <hr class="divider">
+
+    <h2>7. Routinemäßige Löschung personenbezogener Daten</h2>
+    <p>
+      Personenbezogene Daten werden nur für den Zeitraum gespeichert, der zur Erreichung des
+      Speicherzwecks erforderlich ist oder gesetzlich vorgeschrieben wurde. Nach Ablauf der
+      Speicherfrist werden die Daten routinemäßig und entsprechend den gesetzlichen Vorschriften
+      gelöscht oder gesperrt.
+    </p>
+
+    <hr class="divider">
+
+    <h2>8. Rechte der betroffenen Personen</h2>
+
+    <h3>a) Recht auf Bestätigung</h3>
+    <p>
+      Jede betroffene Person hat das Recht, vom Verantwortlichen eine Bestätigung darüber zu
+      verlangen, ob sie betreffende personenbezogene Daten verarbeitet werden. Zur Ausübung
+      dieses Rechts kann sie sich jederzeit an ein Mitglied des Vorstandes wenden.
+    </p>
+
+    <h3>b) Recht auf Auskunft</h3>
+    <p>Jede betroffene Person hat das Recht auf unentgeltliche Auskunft über ihre gespeicherten Daten sowie Kopien davon, einschließlich Informationen über:</p>
+    <ul>
+      <li>Verarbeitungszwecke und Kategorien der verarbeiteten Daten</li>
+      <li>Empfänger oder Kategorien von Empfängern</li>
+      <li>Geplante Speicherdauer bzw. Kriterien für deren Festlegung</li>
+      <li>Bestehen eines Rechts auf Berichtigung, Löschung oder Einschränkung der Verarbeitung</li>
+      <li>Bestehen eines Beschwerderechts bei einer Aufsichtsbehörde</li>
+      <li>Herkunft der Daten, sofern diese nicht bei der betroffenen Person erhoben wurden</li>
+      <li>Bestehen einer automatisierten Entscheidungsfindung einschließlich Profiling</li>
+    </ul>
+
+    <h3>c) Recht auf Berichtigung</h3>
+    <p>
+      Jede betroffene Person hat das Recht, die unverzügliche Berichtigung sie betreffender
+      unrichtiger personenbezogener Daten sowie die Vervollständigung unvollständiger Daten
+      zu verlangen.
+    </p>
+
+    <h3>d) Recht auf Löschung</h3>
+    <p>Jede betroffene Person hat das Recht auf unverzügliche Löschung ihrer Daten, sofern einer der folgenden Gründe zutrifft:</p>
+    <ul>
+      <li>Die Daten sind für den ursprünglichen Zweck nicht mehr notwendig</li>
+      <li>Die betroffene Person widerruft ihre Einwilligung und es fehlt an einer anderweitigen Rechtsgrundlage</li>
+      <li>Die betroffene Person legt Widerspruch gegen die Verarbeitung ein</li>
+      <li>Die Daten wurden unrechtmäßig verarbeitet</li>
+      <li>Die Löschung ist zur Erfüllung einer rechtlichen Verpflichtung erforderlich</li>
+    </ul>
+
+    <h3>e) Recht auf Einschränkung der Verarbeitung</h3>
+    <p>Jede betroffene Person hat das Recht, die Einschränkung der Verarbeitung zu verlangen, wenn:</p>
+    <ul>
+      <li>die Richtigkeit der Daten bestritten wird und eine Überprüfung noch aussteht</li>
+      <li>die Verarbeitung unrechtmäßig ist, die Person aber keine Löschung wünscht</li>
+      <li>der Verantwortliche die Daten nicht mehr benötigt, die Person sie jedoch für Rechtsansprüche braucht</li>
+      <li>Widerspruch eingelegt wurde und noch nicht feststeht, ob berechtigte Gründe überwiegen</li>
+    </ul>
+
+    <h3>f) Recht auf Datenübertragbarkeit</h3>
+    <p>
+      Jede betroffene Person hat das Recht, ihre personenbezogenen Daten in einem strukturierten,
+      gängigen und maschinenlesbaren Format zu erhalten und diese einem anderen Verantwortlichen
+      zu übermitteln, sofern die Verarbeitung auf einer Einwilligung oder einem Vertrag beruht
+      und mithilfe automatisierter Verfahren erfolgt.
+    </p>
+
+    <h3>g) Recht auf Widerspruch</h3>
+    <p>
+      Jede betroffene Person hat das Recht, aus Gründen ihrer besonderen Situation jederzeit
+      gegen die Verarbeitung ihrer personenbezogenen Daten Widerspruch einzulegen. Der
+      Shanty-Chor Blaue Jungs Weilerswist 1996 e.V. verarbeitet die Daten im Falle des
+      Widerspruchs nicht mehr, es sei denn, es liegen zwingende schutzwürdige Gründe vor,
+      die die Interessen der betroffenen Person überwiegen.
+    </p>
+
+    <h3>h) Automatisierte Entscheidungen einschließlich Profiling</h3>
+    <p>
+      Jede betroffene Person hat das Recht, nicht einer ausschließlich automatisierten
+      Entscheidung unterworfen zu werden, die ihr gegenüber rechtliche Wirkung entfaltet,
+      sofern die Entscheidung nicht für einen Vertragsabschluss erforderlich, gesetzlich
+      zulässig oder mit ausdrücklicher Einwilligung erfolgt ist.
+    </p>
+
+    <h3>i) Recht auf Widerruf einer Einwilligung</h3>
+    <p>
+      Jede betroffene Person hat das Recht, eine datenschutzrechtliche Einwilligung jederzeit
+      zu widerrufen. Zur Ausübung dieses Rechts kann sie sich an ein Mitglied des Vorstandes
+      wenden.
+    </p>
+
+    <hr class="divider">
+
+    <h2>9. Rechtsgrundlage der Verarbeitung</h2>
+    <p>
+      Verarbeitungen beruhen je nach Zweck auf folgenden Rechtsgrundlagen der DS-GVO:
+    </p>
+    <ul>
+      <li><strong>Art. 6 I lit. a</strong> — Einwilligung der betroffenen Person</li>
+      <li><strong>Art. 6 I lit. b</strong> — Erfüllung eines Vertrags oder vorvertraglicher Maßnahmen</li>
+      <li><strong>Art. 6 I lit. c</strong> — Erfüllung einer rechtlichen Verpflichtung (z.B. Steuerrecht)</li>
+      <li><strong>Art. 6 I lit. d</strong> — Schutz lebenswichtiger Interessen</li>
+      <li><strong>Art. 6 I lit. f</strong> — Wahrung berechtigter Interessen des Vereins</li>
+    </ul>
+
+    <hr class="divider">
+
+    <h2>10. Berechtigte Interessen</h2>
+    <p>
+      Soweit die Verarbeitung auf Art. 6 I lit. f DS-GVO beruht, ist unser berechtigtes
+      Interesse die Durchführung unserer Vereinstätigkeit zugunsten des Wohlergehens
+      all unserer Mitglieder.
+    </p>
+
+    <hr class="divider">
+
+    <h2>11. Speicherdauer</h2>
+    <p>
+      Personenbezogene Daten werden nur so lange gespeichert, wie es die jeweilige gesetzliche
+      Aufbewahrungsfrist vorschreibt. Nach Ablauf dieser Frist werden die Daten routinemäßig
+      gelöscht, sofern sie nicht mehr zur Vertragserfüllung oder -anbahnung erforderlich sind.
+    </p>
+
+    <hr class="divider">
+
+    <h2>12. Bereitstellung personenbezogener Daten</h2>
+    <p>
+      Die Bereitstellung personenbezogener Daten kann gesetzlich vorgeschrieben (z.B.
+      Steuervorschriften) oder vertraglich erforderlich sein. In bestimmten Fällen ist ein
+      Vertragsabschluss ohne Bereitstellung der Daten nicht möglich. Betroffene Personen
+      können sich vorab an ein Mitglied unseres Vorstandes wenden, das sie über die
+      Erforderlichkeit und die Folgen einer Nichtbereitstellung aufklärt.
+    </p>
+
+    <hr class="divider">
+
+    <h2>13. Automatisierte Entscheidungsfindung</h2>
+    <p>
+      Als verantwortungsbewusster Verein verzichten wir vollständig auf automatische
+      Entscheidungsfindung oder Profiling.
+    </p>
+
+  </div>
+</main>
 
 </body>
-
 </html>
