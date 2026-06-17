@@ -30,6 +30,7 @@
 
     body {
       font-family: 'Lato', sans-serif;
+      font-size: 1.05rem;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
@@ -56,9 +57,10 @@
     /* Nautical wave divider — the signature element */
     .wave {
       display: block;
-      width: 100%;
+      width: calc(100% + 2rem);
       height: 48px;
       margin-top: 1rem;
+      margin-left: -1rem;
     }
 
     /* ── Main layout ─────────────────────────────────────────── */
@@ -101,7 +103,7 @@
     }
 
     #folderDescription p {
-      color: var(--muted);
+      color: var(--text);
       line-height: 1.7;
       margin-top: .8rem;
     }
@@ -152,8 +154,8 @@
     }
 
     .media-item .caption {
-      font-size: .82rem;
-      color: var(--muted);
+      font-size: .88rem;
+      color: #4b5563;
       margin-top: 7px;
       padding: 0 2px;
       text-align: center;
