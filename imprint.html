@@ -18,6 +18,9 @@
       --navy-lt: #003166;
       --gold:    #c8a96e;
       --bg:      #f4f6f9;
+      --card-bg: #ffffff;
+      --text:    #1a1a2e;
+      --muted:   #6b7280;
       --radius:  12px;
       --shadow:  0 2px 10px rgba(0,0,0,.10);
       --trans:   0.2s ease;
@@ -30,6 +33,7 @@
       font-family: 'Lato', sans-serif;
       font-size: 1.05rem;
       background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
     }
 
@@ -58,7 +62,7 @@
 
     /* ── Main ────────────────────────────────────────────────── */
     main {
-      max-width: 1040px;
+      max-width: 860px;
       margin: 0 auto;
       padding: 1.5rem 5vw 3rem;
     }
@@ -81,22 +85,70 @@
 
     .back-btn:hover { background: var(--navy-lt); }
 
-    /* ── PDF wrapper ─────────────────────────────────────────── */
-    .pdf-wrapper {
-      margin-top: 1.4rem;
-      width: 100%;
-      height: 90vh;
+    /* ── Content card ────────────────────────────────────────── */
+    .imprint-card {
+      background: var(--card-bg);
       border-radius: var(--radius);
-      overflow: hidden;
       box-shadow: var(--shadow);
-      border: 1px solid rgba(0,0,0,.08);
+      padding: 2.4rem 2.8rem;
+      margin-top: 1.4rem;
+      text-align: left;
     }
 
-    .pdf-wrapper iframe {
-      width: 100%;
-      height: 100%;
+    @media (max-width: 600px) {
+      .imprint-card { padding: 1.6rem 1.4rem; }
+    }
+
+    /* ── Typography inside card ──────────────────────────────── */
+    .imprint-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: var(--navy);
+      margin: 2rem 0 .6rem;
+      padding-left: .8rem;
+      border-left: 3px solid var(--gold);
+    }
+
+    .imprint-card h2:first-child { margin-top: 0; }
+
+    .imprint-card p {
+      color: var(--text);
+      line-height: 1.8;
+      margin-bottom: .5rem;
+    }
+
+    .imprint-card a {
+      color: var(--navy-lt);
+      text-decoration: none;
+      font-weight: 700;
+      transition: opacity var(--trans);
+    }
+
+    .imprint-card a:hover { opacity: .7; }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: .3rem 1.2rem;
+      margin-top: .5rem;
+    }
+
+    .meta-grid dt {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: .9rem;
+      white-space: nowrap;
+    }
+
+    .meta-grid dd {
+      color: var(--text);
+      font-size: .9rem;
+    }
+
+    .divider {
       border: none;
-      display: block;
+      border-top: 1px solid rgba(0,0,0,.07);
+      margin: 2rem 0;
     }
   </style>
 </head>
@@ -114,8 +166,101 @@
 <main>
   <a href="index.html" class="back-btn">← Zurück zur Hauptseite</a>
 
-  <div class="pdf-wrapper">
-    <iframe src="imprint.pdf" title="Impressum PDF"></iframe>
+  <div class="imprint-card">
+
+    <h2>Angaben gemäß § 5 TMG</h2>
+    <p>Shanty-Chor Blaue Jungs Weilerswist 1996 e.V.</p>
+    <dl class="meta-grid">
+      <dt>Erster Vorsitzender</dt><dd>René Bertram</dd>
+      <dt>Stv. Vorsitzender</dt> <dd>Ralf Miottel</dd>
+      <dt>Adresse</dt>           <dd>Friedrich-Ebert-Str. 13a, 53919 Weilerswist</dd>
+      <dt>Telefon</dt>           <dd><a href="tel:+4922548458785">02254 845878</a></dd>
+      <dt>Fax</dt>               <dd>02254 845870</dd>
+      <dt>Mobil</dt>             <dd><a href="tel:+491709236047">0170 9236047</a></dd>
+      <dt>E-Mail</dt>            <dd><a href="mailto:rene.bertram@gmx.net">rene.bertram@gmx.net</a></dd>
+    </dl>
+
+    <hr class="divider">
+
+    <h2>Bankverbindung</h2>
+    <dl class="meta-grid">
+      <dt>Institut</dt>  <dd>Kreissparkasse Euskirchen</dd>
+      <dt>IBAN</dt>      <dd>DE79 3825 0110 0001 7196 65</dd>
+      <dt>BIC</dt>       <dd>WELADED1EUS</dd>
+      <dt>Steuer-Nr.</dt><dd>209/5729/0902</dd>
+      <dt>Register</dt>  <dd>VR 12716 AG Bonn</dd>
+    </dl>
+
+    <hr class="divider">
+
+    <h2>Inhaltlich verantwortlich</h2>
+    <p>
+      Gemäß § 55 Abs. II RStV: René Bertram,
+      Friedrich-Ebert-Str. 13a, 53919 Weilerswist.
+    </p>
+
+    <hr class="divider">
+
+    <h2>Haftungsausschluss</h2>
+
+    <h2>1. Inhalt des Onlineangebotes</h2>
+    <p>
+      Der Autor übernimmt keinerlei Gewähr für die Aktualität, Korrektheit, Vollständigkeit oder
+      Qualität der bereitgestellten Informationen. Haftungsansprüche gegen den Autor, welche sich
+      auf Schäden materieller oder ideeller Art beziehen, die durch die Nutzung oder Nichtnutzung
+      der dargebotenen Informationen bzw. durch die Nutzung fehlerhafter und unvollständiger
+      Informationen verursacht wurden, sind grundsätzlich ausgeschlossen, sofern seitens des Autors
+      kein nachweislich vorsätzliches oder grob fahrlässiges Verschulden vorliegt. Alle Angebote
+      sind freibleibend und unverbindlich. Der Autor behält es sich ausdrücklich vor, Teile der
+      Seiten oder das gesamte Angebot ohne gesonderte Ankündigung zu verändern, zu ergänzen, zu
+      löschen oder die Veröffentlichung zeitweise oder endgültig einzustellen.
+    </p>
+
+    <h2>2. Verweise und Links</h2>
+    <p>
+      Bei direkten oder indirekten Verweisen auf fremde Webseiten („Hyperlinks"), die außerhalb
+      des Verantwortungsbereiches des Autors liegen, würde eine Haftpflicht ausschließlich in dem
+      Fall in Kraft treten, in dem der Autor von den Inhalten Kenntnis hat und es ihm technisch
+      möglich und zumutbar wäre, die Nutzung im Falle rechtswidriger Inhalte zu verhindern. Der
+      Autor erklärt hiermit ausdrücklich, dass zum Zeitpunkt der Linksetzung keine illegalen Inhalte
+      auf den zu verlinkenden Seiten erkennbar waren. Auf die aktuelle und zukünftige Gestaltung,
+      die Inhalte oder die Urheberschaft der verlinkten Seiten hat der Autor keinerlei Einfluss.
+      Deshalb distanziert er sich hiermit ausdrücklich von allen Inhalten aller verlinkten Seiten,
+      die nach der Linksetzung verändert wurden. Für illegale, fehlerhafte oder unvollständige
+      Inhalte und insbesondere für Schäden, die aus der Nutzung oder Nichtnutzung solcher
+      Informationen entstehen, haftet allein der Anbieter der Seite, auf welche verwiesen wurde.
+    </p>
+
+    <h2>3. Urheber- und Kennzeichenrecht</h2>
+    <p>
+      Der Autor ist bestrebt, in allen Publikationen die Urheberrechte der verwendeten Grafiken,
+      Tondokumente, Videosequenzen und Texte zu beachten oder auf lizenzfreie Materialien
+      zurückzugreifen. Alle innerhalb des Internetangebotes genannten und ggf. durch Dritte
+      geschützten Marken- und Warenzeichen unterliegen uneingeschränkt den Bestimmungen des
+      jeweils gültigen Kennzeichenrechts und den Besitzrechten der jeweiligen eingetragenen
+      Eigentümer. Das Copyright für veröffentlichte, vom Autor selbst erstellte Inhalte bleibt
+      allein beim Autor. Eine Vervielfältigung oder Verwendung solcher Inhalte in anderen
+      elektronischen oder gedruckten Publikationen ist ohne ausdrückliche Zustimmung des Autors
+      nicht gestattet.
+    </p>
+
+    <h2>4. Internet-Bedingungen</h2>
+    <p>
+      Das Internet arbeitet als dezentraler Netzwerkverbund mit der Zwischenspeicherung und
+      Weitergabe temporärer Daten. Eine Gewähr für den Ausschluss von Manipulation oder
+      versehentlichem Verfälschen sowie die Verwendung nur aktueller Daten auf dem Verbindungsweg
+      zwischen Anbieter und Nutzer kann daher nicht gegeben werden. Für die Richtigkeit der
+      Angaben und die Übereinstimmung mit den Ursprungsdaten kann keine Gewähr übernommen werden.
+    </p>
+
+    <h2>5. Rechtswirksamkeit</h2>
+    <p>
+      Dieser Haftungsausschluss ist als Teil des Internetangebotes zu betrachten, von dem aus
+      auf diese Seite verwiesen wurde. Sofern Teile oder einzelne Formulierungen dieses Textes
+      der geltenden Rechtslage nicht, nicht mehr oder nicht vollständig entsprechen sollten,
+      bleiben die übrigen Teile des Dokumentes in ihrem Inhalt und ihrer Gültigkeit davon unberührt.
+    </p>
+
   </div>
 </main>
 
