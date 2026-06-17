@@ -236,34 +236,25 @@ function removeExtension(name) {
   return name.replace(/\.[^/.]+$/, "");
 }
 
-function getImageBaseSize(img) {
-  const rect = img.getBoundingClientRect();
-  return {
-    w: rect.width,
-    h: rect.height
-  };
-}
-
 function updateImageTransform() {
   const img = document.getElementById("lightbox-img");
-  if (!img || !img.complete) return;
 
   const vw = window.innerWidth;
   const vh = window.innerHeight;
 
-  const rect = img.getBoundingClientRect();
+  const displayW = img.offsetWidth;
+  const displayH = img.offsetHeight;
 
-  const scaledW = rect.width * zoom;
-  const scaledH = rect.height * zoom;
+  const scaledW = displayW * zoom;
+  const scaledH = displayH * zoom;
 
   const maxX = Math.max(0, (scaledW - vw) / 2);
   const maxY = Math.max(0, (scaledH - vh) / 2);
 
-  panX = Math.max(-maxX, Math.min(maxX, panX));
-  panY = Math.max(-maxY, Math.min(maxY, panY));
+  panX = Math.min(maxX, Math.max(-maxX, panX));
+  panY = Math.min(maxY, Math.max(-maxY, panY));
 
-  img.style.transform =
-    `translate3d(${panX}px, ${panY}px, 0) scale(${zoom})`;
+  img.style.transform = `translate3d(${panX}px, ${panY}px, 0) scale(${zoom})`;
 }
 
 async function listFiles(folderId) {
@@ -390,14 +381,17 @@ function openLightbox(id) {
     panY = 0;
 
     img.onload = () => {
-      requestAnimationFrame(updateImageTransform);
+      zoom = 1;
+      panX = 0;
+      panY = 0;
+      updateImageTransform();
     };
 
     img.src = `https://lh3.googleusercontent.com/d/${f.id}=w2400`;
     img.style.display = "block";
     vid.style.display = "none";
 
-    requestAnimationFrame(updateImageTransform);
+    updateImageTransform();
   } else {
     vid.src = `https://drive.google.com/file/d/${f.id}/preview`;
     vid.style.display = "block";
@@ -530,13 +524,17 @@ lightboxImg.addEventListener("touchend", () => {
 let lastTap = 0;
 
 lightboxImg.addEventListener("touchend", e => {
+
+  const wasPinching = isPinching;
+
   if (e.touches.length < 2) {
     isPinching = false;
   }
 
   isDragging = false;
 
-  requestAnimationFrame(updateImageTransform);
+  if (wasPinching)
+    return;
 
   const touch = e.changedTouches[0];
 
@@ -601,10 +599,6 @@ lightboxImg.addEventListener("touchmove", e => {
 
 lightboxImg.addEventListener("dragstart", e => {
   e.preventDefault();
-});
-
-window.addEventListener("resize", () => {
-  requestAnimationFrame(updateImageTransform);
 });
 </script>
 
