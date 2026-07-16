@@ -164,6 +164,46 @@
       text-overflow: ellipsis;
     }
 
+    .video-thumb {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .video-thumb img {
+      width: 100%;
+      display: block;
+    }
+
+    .play-icon {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,.28);
+      transition: background var(--trans);
+    }
+
+    .play-icon::after {
+      content: '';
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.92);
+      display: flex;
+      /* Triangle via clip-path on a pseudo */
+      clip-path: none;
+      box-shadow: 0 2px 12px rgba(0,0,0,.3);
+      /* Play triangle drawn with border trick */
+      border-left: 20px solid var(--navy);
+      border-top: 13px solid transparent;
+      border-bottom: 13px solid transparent;
+      margin-left: 6px; /* optical centering of triangle */
+  }
+
+.media-item:hover .play-icon { background: rgba(0,0,0,.45); }
+
     /* ── Skeleton loading ────────────────────────────────────── */
     .skeleton {
       background: linear-gradient(90deg, #e4e8f0 25%, #f0f2f7 50%, #e4e8f0 75%);
@@ -423,8 +463,11 @@ async function renderFolder(folderId) {
 
     } else if (f.mimeType.startsWith("video/") || f.name.endsWith(".mp4")) {
       card.innerHTML = `
-        <iframe src="https://drive.google.com/file/d/${f.id}/preview"
-                title="${name}" loading="lazy"></iframe>
+        <div class="video-thumb">
+          <img src="https://drive.google.com/thumbnail?id=${f.id}&sz=w1000"
+              loading="lazy" alt="${name}">
+          <div class="play-icon"></div>
+        </div>
         ${captionHTML}`;
       card.onclick = () => openLightbox(f.id);
     }
