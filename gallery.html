@@ -434,9 +434,9 @@ async function renderFolder(folderId) {
     const back = document.createElement("button");
     back.className = "back-btn";
     back.textContent = "← Zurück";
-    back.style.cssText = "border:none;cursor:pointer;margin-bottom:1rem;";
+    back.style.cssText = "border:none;cursor:pointer;grid-column:1/-1;justify-self:start;";
     back.onclick = () => { folderStack.pop(); renderFolder(folderStack.at(-1)); };
-    gallery.before(back);
+    gallery.appendChild(back);
   }
 
   for (const f of files) {
