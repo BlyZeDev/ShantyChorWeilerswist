@@ -61,6 +61,10 @@
       height: 48px;
       margin-top: 1rem;
       margin-left: -1rem;
+      margin-bottom: -1px; /* eliminates a hairline sliver of the navy
+                               header peeking out beneath the curve at
+                               some zoom levels / sub-pixel widths */
+      vertical-align: bottom;
     }
 
     /* ── Main layout ─────────────────────────────────────────── */
@@ -162,6 +166,7 @@
     .media-item img,
     .media-item iframe {
       width: 100%;
+      height: auto;
       border-radius: 8px;
       display: block;
     }
@@ -181,13 +186,12 @@
       position: relative;
       border-radius: 8px;
       overflow: hidden;
-      aspect-ratio: 4/3;
+      display: block;
     }
 
     .video-thumb img {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      height: auto;
       display: block;
     }
 
