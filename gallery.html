@@ -140,7 +140,7 @@
     .gallery {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      align-items: start;
+      grid-auto-rows: 4px;
       gap: 20px;
       margin-top: 2rem;
     }
@@ -157,6 +157,7 @@
       cursor: pointer;
       transition: transform var(--trans), box-shadow var(--trans);
       overflow: hidden;
+      grid-row-end: span 60; /* fallback until JS measures the real height */
     }
 
     .media-item:hover {
@@ -226,6 +227,7 @@
       border-radius: var(--radius);
       aspect-ratio: 4/3;
       cursor: default;
+      grid-row-end: span 60;
     }
 
     @keyframes shimmer {
@@ -366,6 +368,23 @@ let swipeStartX = 0, swipeStartY = 0;
 let initialDistance = 0, initialZoom = 1;
 let lastTap = 0;
 
+/* ── Masonry packing ─────────────────────────────────────────────────
+   The grid uses a small fixed row unit (4px); each card is given a
+   grid-row span computed from its real rendered height so cards pack
+   tightly instead of all stretching to the tallest item in the row.
+   A ResizeObserver keeps this correct on load and on window resize. */
+const MASONRY_ROW_PX = 4;
+const MASONRY_GAP_PX = 20;
+
+const masonryObserver = new ResizeObserver(entries => {
+  for (const entry of entries) {
+    const item = entry.target;
+    const height = entry.contentRect.height + 2 * 10; // + card padding (10px top/bottom)
+    const span = Math.ceil((height + MASONRY_GAP_PX) / (MASONRY_ROW_PX + MASONRY_GAP_PX));
+    item.style.gridRowEnd = `span ${span}`;
+  }
+});
+
 /* ── DOM refs ────────────────────────────────────────────────────── */
 const gallery      = document.getElementById("photoGallery");
 const descBox      = document.getElementById("folderDescription");
@@ -431,6 +450,7 @@ async function renderFolder(folderId) {
   gallery.innerHTML = "";
   descBox.innerHTML = "";
   folderBackWrap.innerHTML = "";
+  masonryObserver.disconnect();
 
   // Show skeletons while loading
   for (let i = 0; i < 6; i++) {
@@ -511,6 +531,7 @@ async function renderFolder(folderId) {
     }
 
     gallery.appendChild(card);
+    masonryObserver.observe(card);
   }
 }
 
