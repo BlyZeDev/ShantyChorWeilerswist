@@ -61,7 +61,10 @@
       height: 48px;
       margin-top: 1rem;
       margin-left: -1rem;
-      margin-bottom: -1px;
+      margin-bottom: -1px; /* eliminates a hairline sliver of the navy
+                               header peeking out beneath the curve at
+                               some zoom levels / sub-pixel widths */
+      vertical-align: bottom;
     }
 
     /* ── Main layout ─────────────────────────────────────────── */
@@ -355,7 +358,7 @@ const API_KEY       = "AIzaSyDEcx7ykFSsLv2t-qegaNu4Uy540LpgDbQ";
 const ROOT_FOLDER   = "1v4HNqreRXUlOIWu9Xy9q35hjQ299Cuv3";
 
 /* ── State ───────────────────────────────────────────────────────── */
-const folderStack = [ROOT_FOLDER];
+let folderStack = [ROOT_FOLDER];
 let viewableFiles  = [];
 let currentIndex   = 0;
 
@@ -401,7 +404,39 @@ const PLAY_ICON_SVG = `
     <path d="M24 18 L44 30 L24 42 Z" fill="#002147"/>
   </svg>`;
 
-/* ── API helpers ─────────────────────────────────────────────────── */
+/* ── Folder-path persistence (URL hash) ─────────────────────────────
+   Keeps the current subfolder in the URL (e.g. "#folderIdA/folderIdB")
+   so a page refresh — or a bookmarked/shared link — lands back in the
+   same folder instead of always resetting to the gallery overview.
+   Also wires up browser back/forward to move between folders. */
+let isApplyingHash = false;
+
+function updateHashFromStack() {
+  isApplyingHash = true;
+  const subPath = folderStack.slice(1).join("/"); // omit the root folder id
+  const newHash = subPath ? `#${subPath}` : "";
+  if (newHash) {
+    history.pushState(null, "", newHash);
+  } else {
+    history.pushState(null, "", location.pathname + location.search);
+  }
+  // Reset the guard on the next tick, after any hashchange this triggers.
+  setTimeout(() => { isApplyingHash = false; }, 0);
+}
+
+function readStackFromHash() {
+  const raw = location.hash.replace(/^#/, "");
+  const ids = raw.split("/").filter(Boolean);
+  return [ROOT_FOLDER, ...ids];
+}
+
+window.addEventListener("popstate", () => {
+  if (isApplyingHash) return;
+  folderStack = readStackFromHash();
+  renderFolder(folderStack.at(-1));
+});
+
+
 async function driveJSON(url) {
   const res = await fetch(url);
   return res.json();
@@ -482,7 +517,7 @@ async function renderFolder(folderId) {
     const back = document.createElement("button");
     back.className = "back-btn";
     back.textContent = "← Zurück";
-    back.onclick = () => { folderStack.pop(); renderFolder(folderStack.at(-1)); };
+    back.onclick = () => { folderStack.pop(); updateHashFromStack(); renderFolder(folderStack.at(-1)); };
     folderBackWrap.appendChild(back);
   }
 
@@ -500,7 +535,7 @@ async function renderFolder(folderId) {
         <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png"
              style="width:50%;display:block;margin:1rem auto;opacity:.75;" alt="Ordner">
         <div class="caption">${name}</div>`;
-      card.onclick = () => { folderStack.push(f.id); renderFolder(f.id); };
+      card.onclick = () => { folderStack.push(f.id); updateHashFromStack(); renderFolder(f.id); };
 
     } else if (f.mimeType.startsWith("image/")) {
       card.innerHTML = `
@@ -709,7 +744,10 @@ lbImg.addEventListener("touchend", e => {
 });
 
 /* ── Boot ────────────────────────────────────────────────────────── */
-document.addEventListener("DOMContentLoaded", () => renderFolder(ROOT_FOLDER));
+document.addEventListener("DOMContentLoaded", () => {
+  folderStack = readStackFromHash();
+  renderFolder(folderStack.at(-1));
+});
 </script>
 
 </body>
